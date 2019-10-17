@@ -1,0 +1,152 @@
+#模块和包
+#包的制作和安装(纯python代码)
+#给程序传递参数
+#列表推导式
+
+1.模块和包
+
+如何查看一个模块的位置：模块名.__file__
+
+模块：一个提前写好的，保存在我们计算机里的代码文件。
+包：把多个模块或者子包按照一定的层次结构组织起来就构成了包。
+
+模块和包的导入方式：
+import A    # 如果A是一个包，A目录下的__init__.py是空的，那么，这是一种错误的使用方式。(如果A是一个模块，就可以正常使用) 
+from A import B    #如果A是一个包，B是一个模块，那么，这是一种正确的使用方式。
+from A import *    #如果A是一个包，* 代表 所有的模块，A目录下__init__.py是空的，那么，这是一种错误的使用方式。(正确的方式应该在__init__.py中定义__all__这个变量)
+import A as a      # as 作用是 取别名。
+from A import B as b
+
+模块搜索路径存储在system模块的sys.path变量中
+
+if __name__ == '__main__' 语句的作用：避免模块或者包 里面的测试代码运行。
+总结：如果是 直接执行 模块 ，那么 __name__ = '__main__'
+      如果是导入，那么 __name__ = 模块名字
+
+模块 全局变量 __all__ 的作用：这个变量是 一个列表，只有写入这个列表的 全局变量 才会通过 from xx import * 导入
+
+按照 目录结构图 去 创建文件和目录，然后去 ipython里 导入 测试，发现不能用。因为此时 pack 还不是 Python里的包。
+需要我们在pack目录和music目录下，手动创建 __init__.py 这个文件。然后就可以正常导入了。
+需要注意的是：在Python3.3和之后的版本中，不加__init__.py 也可以执行导入包的操作。
+from pack.music import zhoujielun   #导入成功，正常使用
+from pack import func               #导入成功，正常使用
+
+import pack.func                  #导入成功，正常使用
+import pack.music.zhoujielun      #导入成功，正常使用
+
+from pack import *          # 导入 失败
+from pack.music import *    # 导入 失败
+
+import pack          #导入成功，但是这种方式，没有把包里面的模块导入，所以还是不能用。
+import pack.music    #导入成功，但是这种方式，没有把包里面的模块导入，所以还是不能用。
+
+此时，如果 import pack.music 之后，想要直接使用zhoujielun和beyond这两个模块呢？
+    打开 ~/pack/music/__init__.py，添加：
+                                    from . import zhoujielun
+                                    from . import beyond
+
+    然后 打开 ipython3.测试：import pack.music    #导入 成功 正常使用
+                             pack.music.zhoujielun.qilixiang()
+                             pack.music.beyond.xihuanni()
+
+                        或者：
+                            from pack.music import *   #导入 成功 正常使用，这里我们没有定义__all__这个变量，为啥可以正常使用呢？
+                            zhoujielun.qilixiang()     # 因为 music目录下 __init__.py 导入了对应的模块。
+
+                        或者：
+                            from pack import *    #导入 失败
+                            func.test()    
+
+2.包的制作和安装
+
+如何把 pack 这个包 制作成一个可以 方便 其他人使用的包呢？
+    1).
+        在 pack 同级目录 创建一个文件 setup.py,然后添加如下内容：
+        from distutils.core import setup
+
+        setup(name="itcast", version="1.0", description="dongGe's module", author="zhou", py_modules=['pack.func', 'pack.music.zhoujielun', 'pack.music.beyond',])
+
+    2).
+        执行 python3 setup.py build  命令
+
+        执行 python3 setup.py sdist  命令
+
+
+        生成的最终压缩包在 dist目录下
+
+包已经制作好了，如何安装呢？
+    1).
+        把 压缩包 拷贝到 桌面
+
+        解压到当前目录
+
+        进入 解压出来的目录里 执行 python3 setup.py install
+
+    2)
+        打开 ipytho3 进行测试
+
+3. 给程序传递参数
+
+代码：
+    import sys
+    import os
+
+    def readfile(filename):
+        with open(filename) as f:
+            while True:
+                line = f.readline()
+                if len(line) == 0:
+                    print('%s读取完毕!!!' % filename)
+                    break
+                print(line)
+
+    def main():
+        if len(sys.argv) < 2:
+            print("输入的命令不完整")
+            sys.exit()
+        elif sys.argv[1].startswith('--'):
+            option = sys.argv[1][2:]
+            if option == 'version':
+                print('Version 1.1.1')
+            elif option == 'help':
+                print('''\
+        This program prints files to the standard output.
+        Any number of files can be specified.
+        Options include:
+        --version : Prints the version number
+        --help    : Display this help''')
+            else:
+                print('未知的选项!!!')
+                sys.exit()
+            
+        else:
+            for filename in sys.argv[1:]:
+                if os.path.exists(filename):
+                    readfile(filename)    
+                else:
+                    print('%s这个文件不存在!!!' % filename)
+
+    if __name__ == "__main__":
+        main()
+
+4. 列表推导式
+
+    1). test = [x*2 for x in range(4)]
+
+        等效于：
+            test = []
+            for x in range(4):
+                test.append(x*2)
+
+    2). test = [x*2 for x in range(4) for i in range(2)]
+        
+        等效于：
+            test = []
+            for x in range(4):
+                for i in range(2):
+                    test.append(x*2)
+
+
+
+
+        

@@ -1,0 +1,374 @@
+首先注意：以__开头并且以__结尾的 并不都是 魔法方法，也有一些是內建的属性。
+http://pyzh.readthedocs.io/en/latest/python-magic-methods-guide.html
+
+1. __str__ 和 __repr__
+    代码：
+        class test(object):
+
+            def __init__(self):
+                self.a = 100
+
+            def __str__(self):
+                return '我是__str__属性a的值为:%s' % self.a
+
+            def __repr__(self):
+                return '我是__repr__属性a的值为:%s' % self.a
+
+
+        t = test()
+        #print(t)       # 优先调用__str__,__str__没有定义，会去调用__repr__
+        print(str(t))   # 调用 __str__,__str__没有定义，会去调用__repr__
+        print(repr(t))  # 调用 __repr__
+
+    # __str__()用于显示给用户，而__repr__()用于显示给开发人员
+
+2. __cmp__ 
+
+    这个方法 在python3中已经被删除了。我们来学习下 在python2中如何使用。
+
+    首要 学习下 cmp() 这个內建函数。
+
+    In [7]: cmp(10,5)
+    Out[7]: 1
+
+    In [8]: cmp(5,10)
+    Out[8]: -1
+
+    In [9]: cmp(5,5)
+    Out[9]: 0
+
+    cmp()函数， 接收两个参数。有如下的特点：
+                如果返回值为 1， 代表 第一个参数 大于 第二个参数。
+                如果返回值为-1，代表 第一个参数 小于 第二个参数。
+                如果返回值为 0， 代表 第一个参数 等于 第二个参数。
+
+    那么 现在 问题来了，如果 有两个 字符串 ，我们需要比较字符串的 长度。使用cmp()函数如何达到我们的目的呢？
+
+        代码：
+            class Word(str):
+    
+                def __cmp__(self, other):
+
+                    if len(self) > len(other):
+                        return 1
+
+                    elif len(self) < len(other):
+                        return -1
+
+                    elif len(self) == len(other):
+                        print('----比较结果相等------')
+                        return 0
+
+            w1 = Word('asda')
+            w2 = Word('abcd')
+            print(w1==w2)
+            print(cmp(w1,w2))   # cmp函数的 两个参数都是 Word类型的时候，才会调用__cmp__方法
+
+        运行代码：打印了False和0.为什么第一个print没有打印True呢？而cmp()函数比较的结果是相等。
+                  这是因为 cmp() 函数在比较的时候 调用了 __cmp__ 方法，而 == 这个比较操作符，没有调用 __cmp__ 方法。
+                  如果使用 == 比较 如何达到相同的效果呢？后面会介绍。
+
+        注意：__cmp__ 这个方法 应该在 self > other 返回 正整数。self < other 返回负整数。self == other 返回 0. 一定要严格遵守这条约定。
+
+3. __eq__ 、__ne__ 、__lt__ 、__gt__、__le__、__ge__
+
+    python2 中 __cmp__ 的替换方案
+
+    __eq__ : 定义 比较操作符 == 的行为
+    __ne__ : 定义 比较操作符 != 的行为
+    __lt__ : 定义 比较操作符  < 的行为
+    __gt__ : 定义 比较操作符  > 的行为   
+    __le__ : 定义 比较操作符 <= 的行为
+    __ge__ : 定义 比较操作符 >= 的行为
+
+    下面 以 __eq__ 为例：如果想 通过 == 来比较 两个 字符串的长度，应该如何做呢？
+
+    代码：
+        class Word(str):
+
+            def __eq__(self, other):
+                return len(self) == len(other)
+
+        w1 = Word('abc')
+        w2 = Word('jkl')
+
+        print(w1==w2)  # w1.__eq__(w2)
+        print(w1)
+
+    注意：这里，只有 Word类 创建出来的 字符串对象，在进行 == 比较时，才会 通过 比较字符串的长度 得出比较结果。
+          比如：'abc'=='def' 这样直接比较，还是用的python默认的方式进行比较的。
+
+    其他的方法和 __eq__ 的用法 是一样的。
+
+
+4. __setattr__
+    它允许你自定义某个属性的赋值行为，不管这个属性存在与否，也就是说你可以对任意属性的任何变化都定义自己的规则。
+    当给实例属性赋值的时候，这个方法会被调用。如果你在 __setattr__ 方法里面去给属性赋值，会导致无限递归。
+    代码：
+        class Person(object):
+            def __init__(self, age):
+                self.age = age
+
+            def __setattr__(self,name,value):
+                print('%s is not exist' % name)
+
+        a = Person(18)
+        print(a.age)
+
+     当创建实例对象a的 时候，执行__init__方法，给实例属性age赋值，(注意：执行到这里并没有给age属性赋值),然后调用 __setattr__ 方法。
+     继续执行 print(a.age) 语句，程序会抛出 AttributeError 这个异常，因为还没有给 name 属性 赋值。应该怎么做呢？
+     在 __setattr__ 方法里 调用下 父类的 __setattr__ 的方法就行了。( object.__setattr__(self, name, value) )   
+
+4. __delattr__
+    这个魔法方法和 __setattr__ 几乎相同，只不过它是用于处理删除属性时的行为。和 __setattr__ 一样，使用它时也需要多加小心，防止产生无限递归
+    (在 __delattr__ 的实现中调用 del self.name 会导致无限递归)。
+
+    代码：
+        class Person(object):
+    
+            def __init__(self, name):
+                self.name = name
+
+            def __delattr__(self, name):
+                print('-------删除属性--------')
+
+        a = Person('xiao')
+        print(a.name)
+        del a.name
+        print(a.name)
+
+    当代码执行到 del a.name 时(此时，并没有执行 del a.name )，会调用 __delattr__ 方法，如果想让程序继续执行 del a.name 那么需要在 __delattr__ 方法中 调用父类的方法
+
+4. __getattr__ 
+    当用户试图访问一个根本不存在（或者暂时不存在）的属性时，你可以通过这个魔法方法来定义类的行为。
+    这个可以用于捕捉错误的拼写并且给出指引，使用废弃属性时给出警告（如果你愿意，仍然可以计算并且返回该属性），
+    以及灵活地处理AttributeError。只有当试图访问不存在的属性时它才会被调用。
+
+    代码：
+        class Person(object):
+            def __init__(self, name):
+                self.name = name
+  
+            def __getattr__(self,name):
+                return '%s is not exist' % name
+  
+        a = Person('xiao')
+        print(a.age)
+
+7. __getattribute__
+    代码：
+        class Animal(object):
+
+            def __init__(self, name, age):
+                self.name = name
+                self.age = age
+            
+            def __getattribute__(self, obj):
+                if obj == 'name':
+                    print('-----记录日志name-------')
+                    return object.__getattribute__(self,obj)
+                elif obj == 'age':
+                    print('-----记录日志age--------')
+                    return '禁止访问'
+                # else:
+                #     return object.__getattribute__(self, obj)
+
+            def test(self):
+                print("--test--")
+
+        a = Animal('xiao',19)
+        print(a.name)
+        print(a.age)
+
+        a.test()
+        print(a.__dict__)
+
+    print(a.name) 执行过程：
+    python解释器检测到 实例对象a需要访问name属性 ，
+    刚好，这个类重写了__getattribute__方法，
+    那么，程序就直接去执行__getattribute__方法,
+    执行完毕后，把__getattribute__方法的返回值，赋值给a.name,
+    最后执行print(a.name)
+
+    obj的值就是'name'这个字符串。
+
+    注意：实例对象 调用这个类的方法的时候（所有方法），也会调用 __getattribute__ 方法。
+        
+    
+8. __reversed__
+
+    用于反向迭代
+
+    代码：
+    class test(object):
+        def __init__(self, b): #5 [0,1,2,3,4]
+
+            self.b = b
+
+        def __iter__(self):
+            self.a = 0
+            return self
+
+        def __next__(self):
+            if self.a < self.b:
+                i = self.a
+                self.a += 1
+                return i
+            else:
+                raise StopIteration
+
+        def __reversed__(self):
+            print('hahah')
+            #return test2(self.b)
+            return sorted(self, reverse=True)
+
+
+    it = test(10)
+    print(list(it))
+    print(list(reversed(it)))
+    #print(sorted(it,reverse=True))
+
+    # reversed(s), 相当于 s.__reversed__().
+    # __reversed__ 方法 要求返回一个 迭代器。
+    # s 这个对象，需要实现 __reversed__ 方法。如果没有实现 __reversed__ 方法，reversed(s) 会把 s 这个对象当成一个序列处理，如果s不是序列，就会抛出类型错误异常。
+
+9. __bool__
+
+    定义对象的 布尔值。
+
+    代码：
+        class test(object):
+
+            def __init__(self):
+                self.a = 100    
+
+            def __bool__(self):
+                return False
+
+        t = test()
+
+        if t:
+            print(t.a)
+
+
+10. __len__
+
+    返回 容器的长度
+
+    代码：
+        class test(object):
+
+            def __init__(self):
+                self.li = [1,2,3]
+            
+            def __len__(self):
+                print('test')
+                return len(self.li)
+
+
+        t = test()
+        print(len(t))
+
+    #  len(t) ,实际上 调用了 t 的__len__ 方法。
+
+11.  __getitem__
+    
+    # 适用于 序列和字典 这些对象 (列表，元祖，字符串等等)  
+
+    定义 对象 通过 self[key] 访问时的行为。
+
+    代码：
+        class Seq(object):
+
+            def __getitem__(self, i):
+                print("__getslice__")
+                print(i)
+                return 100
+
+        obj = Seq()
+        print(obj[1:2])
+        print("--------------------")
+        print(obj["abc"])
+
+
+        # __getslice__
+        # slice(1, 2, None)
+        # 100
+        # --------------------
+        # __getslice__
+        # abc
+        # 100
+
+12. __setitem__
+    
+    定义 对象 通过 self[key] = value 赋值时的行为。
+
+    代码：
+        class Seq(list):
+
+            def __setitem__(self, i, value):
+                print("__getslice__")
+                print(i)
+                print(value)
+                super().__setitem__(i, value)
+
+        obj = Seq()
+        obj[0:2] = [1,2]   # 设置的值 必须是 可迭代对象
+        print(obj[0:2])  
+        print("--------------------")
+        obj["abc"] = 300
+
+        # __getslice__
+        # slice(0, 2, None)
+        # [1,2]
+        # [1,2]
+        # --------------------
+       
+13. __delitem__
+
+    定义 对象 通过 del self[key] 删除时的行为。
+
+    代码：
+        class test(object):
+
+            def __delitem__(self,key):
+                print('key is {}'.format(key))
+
+        t = test()
+
+        del t[1]
+        print('--------分割线-----------')
+        del t['name'] 
+
+
+14. __contains__
+
+    定义 对象 通过 in 或者 not in 测试成员时的行为。
+    
+    代码：
+        class test(object):
+  
+            def __contains__(self,item):
+                print('item is {}'.format(item))
+                return True
+
+        t = test()
+        print(1 in t)
+        print(1 not in t)
+
+
+15. __getslice__ __setslice__ __delslice__
+    python3 中已经被删除了。被 __getitem__ __setitem__ __delitem__ 替代。
+
+
+
+
+
+
+
+
+
+
+
+
+

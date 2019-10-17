@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)https://www.cnblogs.com/xzwblog/p/6932870.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>URL的编码和解码 - 何必等明天 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="./URL的编码和解码 - 何必等明天 - 博客园_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./URL的编码和解码 - 何必等明天 - 博客园_files/bundle-summerGarden.css">
+<link type="text/css" rel="stylesheet" href="./URL的编码和解码 - 何必等明天 - 博客园_files/352096.css">
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./URL的编码和解码 - 何必等明天 - 博客园_files/bundle-summerGarden-mobile.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/xzwblog/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/xzwblog/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/xzwblog/wlwmanifest.xml">
+<script async="" src="./URL的编码和解码 - 何必等明天 - 博客园_files/analytics.js.下载"></script><script src="./URL的编码和解码 - 何必等明天 - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+<script type="text/javascript">var currentBlogApp = 'xzwblog', cb_enable_mathjax=true;var isLogined=false;</script>
+<script type="text/x-mathjax-config;executed=true">
+    MathJax.Hub.Config({
+        tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], processClass: 'blogpost-body', processEscapes: true },
+        TeX: { 
+            equationNumbers: { autoNumber: ['AMS'], useLabelIds: true }, extensions: ['extpfeil.js'] },
+            'HTML-CSS': { linebreaks: { automatic: true } },
+            SVG: { linebreaks: { automatic: true } }
+        });
+    </script><script src="./URL的编码和解码 - 何必等明天 - 博客园_files/MathJax.js.下载"></script>
+<script src="./URL的编码和解码 - 何必等明天 - 博客园_files/blog-common.js.下载" type="text/javascript"></script>
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body><div id="MathJax_Message" style="display: none;"></div>
+<a name="top"></a>
+
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+	<a id="lnkBlogLogo" href="http://www.cnblogs.com/xzwblog/"><img id="blogLogo" src="./URL的编码和解码 - 何必等明天 - 博客园_files/logo.gif" alt="返回主页"></a>			
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/xzwblog/">何必等明天</a></h1>
+<h2></h2>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+	<li><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a></li>
+	<li><a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/xzwblog/">首页</a></li>
+	<li><a href="http://news.cnblogs.com/">新闻</a></li>
+	<li><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+	<li><a id="blog_nav_contact" accesskey="9" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/%E4%BD%95%E5%BF%85%E7%AD%89%E6%98%8E%E5%A4%A9">联系</a></li>
+	<li><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+	<li><a id="blog_nav_rss" class="menu" href="http://www.cnblogs.com/xzwblog/rss">订阅</a>
+	<a id="blog_nav_rss_image" class="aHeaderXML" href="http://www.cnblogs.com/xzwblog/rss"><img src="./URL的编码和解码 - 何必等明天 - 博客园_files/xml.gif" alt="订阅"></a></li>
+</ul>
+
+
+		<div class="blogStats">
+			
+			<div id="blog_stats">
+<!--done-->
+随笔- 50&nbsp;
+文章- 0&nbsp;
+评论- 0&nbsp;
+</div>
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="http://www.cnblogs.com/xzwblog/p/6932870.html">URL的编码和解码</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown"><h1 id="url的编码和解码"><center>URL的编码和解码</center></h1>
+<p>　　参考：<a href="http://www.ruanyifeng.com/blog/2010/02/url_encoding.html">阮一峰--关于URL编码</a></p>
+<a name="_label0"></a><h2 id="为什么要url编码">1 为什么要URL编码</h2>
+<ul>
+<li><strong>在因特网上传送URL，只能采用ASCII字符集</strong><br>
+　　<br>
+　　也就是说URL只能使用英文字母、阿拉伯数字和某些标点符号，不能使用其他文字和符号，即<br>
+<strong>只有字母和数字<code>[0-9a-zA-Z]</code>、一些特殊符号<code>$-_.+!*'()</code>[不包括双引号]、以及某些保留字（空格转换为<code>+</code>），才可以不经过编码直接用于URL</strong><br>
+这意味着 如果URL中有汉字，就必须编码后使用。 但是麻烦的是 标准的国际组织并没有规定具体的编码方法，而是交给应用程序（浏览器）自己决定。 这导致"URL编码"成为了一个混乱的领域。</li>
+</ul>
+<p>　　如果包含中文，其实会自动编码的，比如Chrome和火狐，"文"和"章"的utf-8编码分别是"E6 96 87"和"E7 AB A0" ,下图所示的"%e6%96%87%e7%ab%a0"就是按照顺序，在每个字节前加上%而得到的:<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602140746102-965405821.png"></p>
+<p><strong>但是不同的浏览器可能会有不同的编码方式，不要将编码交给浏览器。应该用JS在前端对URL编码，这样就实现了统一</strong></p>
+<ul>
+<li>如果key=value这种传参方式中，value中包含<code>?``=</code>或者<code>&amp;</code>等符号，url的解析会变得很困难</li>
+<li>不同的操作系统、浏览器、不同的网页字符集（charset）有不同的默认编码方式，要有一个统一格式来发送url，参考文章中举了4个例子（很有读的必要）！</li>
+</ul>
+<a name="_label1"></a><h2 id="如何编码">2 如何编码</h2>
+<p>　　URL编码通常也被称为百分号编码（percent-encoding），是因为它的编码方式非常简单：<br>
+使用%加上两位的字符——0123456789ABCDEF——代表一个字节的十六进制形式。URL编码要做的，就是将每一个非安全的ASCII字符都被替换为“%xx”格式，<br>
+对于非ASCII字符，RFC文档建议使用utf-8对其进行编码得到相应的字节，然后对每个字节执行百分号编码。<br>
+如"中文"使用UTF-8字符集得到的字节为0xE4 0xB8 0xAD 0xE6 0x96 0x87，经过Url编码之后得到"%E4%B8%AD%E6%96%87"。</p>
+<p>一些常见的特殊字符换成相应的十六进制的值：</p>
+<pre><code class="hljs perl">+   %20   
+/   %2F   
+?   %3F   
+%   %25   
+<span class="hljs-comment">#   %23   </span>
+&amp;   %26  </code></pre>
+<a name="_label1_0"></a><h3 id="js的三种编码函数">2.1 JS的三种编码函数</h3>
+<p>　　上面说了编码方式的混乱，那么如何统一呢？<br>
+<strong>使用Javascript先对URL编码，或者将可以在后台编码的参数编码后再发送给前端使用。然后再向服务器提交，不要给浏览器插手的机会，这样就能保证客户端只用一种编码方法向服务器发出请求 </strong></p>
+<h4 id="escape">escape</h4>
+<p>　　js中编码出生最早的一个，不提倡使用，真正作用是:<br>
+返回一个字符的Unicode编码值，为的是方便他们能在所有计算机上可读，规则：<br>
+所有空格、标点以及其他非ASCII字符都用%xx编码替换; 例如空格返回的是%20 字符值大于255的字符以%uxxxx格式储存</p>
+<h4 id="encodeuri函数推荐使用">encodeURI函数(推荐使用)</h4>
+<p>　　这个函数才是javascript中真正用来对URL编码的函数<br>
+它着眼于对整个URL进行编码，因此除了常见的符号以外，对其他一些在网址中有特殊含义的符号"; / ? : @ &amp; = + $ , #"，也不进行编码。编码后，它输出符号的utf-8形式，并且在每个字节前加上%。<br>
+需要注意的是，它不对单引号'编码<br>
+它对应的解码函数是decodeURI()。</p>
+<p>规则就是我上面第二部分所说的，采用utf-8编码。比如：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602142359118-1683004328.png"></p>
+<a name="_label1_1"></a><h3 id="encodeuricomponent函数推荐使用">encodeURIComponent函数（推荐使用）</h3>
+<p>与encodeURI()的区别是，它用于对URL的组成部分进行个别编码，而不用于对整个URL进行编码。<br>
+因此，"; / ? : @ &amp; = + $ , #"，这些在encodeURI()中不被编码的符号，在encodeURIComponent()中统统会被编码，具体的编码规则是和encodeURI函数是一样的<br>
+它对应的解码函数是decodeURIComponent()。</p>
+<p>实验：<br>
+利用chrome的开发者工具：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602145033008-761982309.png"></p>
+<p>可以看到第一种，对需要url编码的部分用encodeURIComponent函数，其他部分不编码符合要求,即<br>
+<strong>对需要编码的参数用encodeURIComponent函数最推荐</strong></p>
+<a name="_label1_2"></a><h3 id="我们的问题">2.2 我们的问题</h3>
+<p><strong>遇到的问题：</strong><br>
+get请求的路径参数filePath为：/image/5cf4adbe16ad4fc18ab2259cb86bb14d.png，</p>
+<p>在相应的控制器Controller中：</p>
+<pre><code class="hljs css">@<span class="hljs-keyword">RequestMapping(path</span> = <span class="hljs-string">"/admin/{filePath}"</span>)
+</code></pre>
+<p>那么这个请求就变成了：</p>
+<pre><code class="hljs dts"><span class="hljs-symbol">http:</span><span class="hljs-comment">//localhost/admin//image/5cf4adbe16ad4fc18ab2259cb86bb14d.png</span></code></pre>
+<p>由于服务器无法解析上面的url，导致400 bad request错误</p>
+<a name="_label1_3"></a><h3 id="java的urlencoder.encode需要编码的参数utf-8">2.3 Java的URLEncoder.encode("需要编码的参数","UTF-8")</h3>
+<p>比较JS的encodeURIComponent函数和Java的URLEncoder.encode("需要编码的参数","UTF-8")函数：<br>
+对<code>//中国/images/head_tripletown.png//!@#$%^&amp;*()</code>进行URL编码：</p>
+<pre><code class="hljs perl">//JS的encodeURIComponent函数
+javascript:encodeURIComponent(<span class="hljs-string">"//中国/images/head_tripletown.png//!@#$%^&amp;*()"</span>)
+<span class="hljs-string">"%2F%2F%E4%B8%AD%E5%9B%BD%2Fimages%2Fhead_tripletown.png%2F%2F!%40%23%24%25%5E%26*()"</span>
+
+//Java的URLEncoder.encode(<span class="hljs-string">"需要编码的参数"</span>,<span class="hljs-string">"UTF-8"</span>)函数
+URLEncoder.encode(<span class="hljs-string">"//中国/images/head_tripletown.png//!@#$%^&amp;*()"</span>,<span class="hljs-string">"UTF-8"</span>)
+%2f%2f%e4%b8%ad%e5%9b%bd%2fimages%2fhead_tripletown.png%2f%2f!%40%23%24%25%5e%26*()</code></pre>
+<p>可以看到一模一样，因此:<br>
+<strong>使用Javascript先对URL编码，或者将可以在后台编码的参数编码后再发送给前端使用。</strong></p>
+<a name="_label2"></a><h2 id="为什么两次编码">3 为什么两次编码</h2>
+<p>首先看例子，原始请求：</p>
+<pre><code class="hljs ruby"><span class="hljs-symbol">http:</span>/<span class="hljs-regexp">/localhost/admin</span><span class="hljs-regexp">/image/file</span>Path/<span class="hljs-regexp">/images/head</span>_tripletown.png/<span class="hljs-number">200</span>/<span class="hljs-number">200</span></code></pre>
+<p>其中，Controller中的映射文件:</p>
+<pre><code class="hljs css">@<span class="hljs-keyword">RequestMapping(path</span> = <span class="hljs-string">"/admin/image/filePath/{filePath}/{width}/{height}"</span>)</code></pre>
+<p>对filePath参数一次编码后，发起URL请求：<br>
+请求为：<code>http://localhost/admin/image/filePath/%2fimages%2fhead_tripletown.png/200/200</code><br>
+在拦截器加断点：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602154558118-1025131213.png"><br>
+毫无反应。。。<strong>所以应该在拦截器工作前就对URL进行了解码</strong></p>
+<p>对filePath参数两次编码后，发起URL请求：<br>
+请求为：<code>http://localhost/admin/image/filePath/%252fimages%252fhead_tripletown.png/200/200</code><br>
+在拦截器加断点：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602154322555-1479183631.png"></p>
+<p>一次解码之前：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602154406352-1375837638.png"></p>
+<p>一次解码之后：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602154427883-1184204406.png"><br>
+获得了正常回应：<br>
+<img src="./URL的编码和解码 - 何必等明天 - 博客园_files/1156565-20170602154516852-116273.png"></p>
+<a name="_label2_0"></a><h3 id="两次编码的原因">两次编码的原因：</h3>
+<ul>
+<li>一般的原因：解决服务器解码后乱码问题<br>
+　　<br>
+　　如果只进行一次encodeURI，得到的是UTF-8形式的URL，服务器端通过request.getParameter()解码查询参数(通常是iso-8859-1)就会得到乱码。</li>
+</ul>
+<p>　　如果进行两次encodeURI,第一次编码得到的是UTF-8形式的URL，第二次编码得到的依然是UTF-8形式的URL，但是在效果上相当于首先进行了一次UTF-8编码(此时已经全部转换为ASCII字符)，再进行了一次iso-8859-1编码，因为对英文字符来说UTF-8编码和ISO-8859-1编码的效果相同。在服务器端，首先通过request.getParameter()自动进行第一次解码(可能是gb2312,gbk,utf-8,iso-8859-1等字符集,对结果无影响)得到ascii字符，然后再使用UTF-8进行第二次解码，通常使用java.net.URLDecoder("","UTF-8")方法。</p>
+<p>　　两次编码两次解码的过程为：</p>
+<p>UTF-8编码-&gt;UTF-8(iso-8859-1)编码-&gt;iso-8859-1解码-&gt;UTF-8解码，编码和解码的过程是对称的，所以不会出现乱码。</p>
+<ul>
+<li><p>我们的原因：解决400 bad request错误<br>
+　　<br>
+　　由于我们发送的请求为：</p>
+<pre><code class="hljs perl">http:<span class="hljs-regexp">//localhost</span><span class="hljs-regexp">/admin/image</span><span class="hljs-regexp">/filePath/</span>%2fimages%2fhead_tripletown.png/<span class="hljs-number">200</span>/<span class="hljs-number">200</span></code></pre>
+<p>　　服务器端首先进行一次解码，变为:</p>
+<pre><code class="hljs ruby"><span class="hljs-symbol">http:</span>/<span class="hljs-regexp">/localhost/admin</span><span class="hljs-regexp">/image/file</span>Path/<span class="hljs-regexp">/images/head</span>_tripletown.png/<span class="hljs-number">200</span>/<span class="hljs-number">200</span></code></pre>
+<p>　　在dispatcherservlet（前端控制器，用来查询映射文件，转发请求和转发回应）中查询映射文件，发现没有匹配的RequestMapping，就会报400 bad request错误</p></li>
+</ul>
+<p>　　如果两次编码：</p>
+<pre><code class="hljs perl">http:<span class="hljs-regexp">//localhost</span><span class="hljs-regexp">/admin/image</span><span class="hljs-regexp">/filePath/</span>%252fimages%252fhead_tripletown.png/<span class="hljs-number">200</span>/<span class="hljs-number">200</span></code></pre>
+<p>　　服务器端首先进行一次解码，变为:</p>
+<pre><code class="hljs perl">http:<span class="hljs-regexp">//localhost</span><span class="hljs-regexp">/admin/image</span><span class="hljs-regexp">/filePath/</span>%2fimages%2fhead_tripletown.png/<span class="hljs-number">200</span>/<span class="hljs-number">200</span></code></pre>
+<p>　　查询映射文件可以正常转发，在接收请求后在手动进行一次解码。</p>
+<a name="_label3"></a><h2 id="扩展">4 扩展</h2>
+<a name="_label3_0"></a><h3 id="什么是applicationx-www-form-urlencoded">什么是application/x-www-form-urlencoded</h3>
+<p>　　它是一种编码类型。当URL地址里包含非西欧字符的字符串时，系统会将这些字符转换成application/x-www-form-urlencoded字符串。表单里提交时也是如此，当包含非西欧字符的字符串时，系统也会将这些字符转换成application/x-www-form-urlencoded字符串，然后在服务器端自动解码。FORM元素的enctype属性指定了表单数据向服务器提交时所采用的编码类型，默认的缺省值是“application/x-www-form-urlencoded。</p>
+<p>　　然而，在向服务器发送大量的文本、包含大量非ASCII字符的文本或二进制数据时这种编码方式效率很低。这个时候我们就要使用另一种编码类型“multipart/form-data”，比如在我们在做上传的时候，表单的enctype属性一般会设置成“multipart/form-data”。 Browser端<code>&lt;form&gt;</code>表单的ENCTYPE属性值为multipart/form-data，它告诉我们传输的数据要用到多媒体传输协议，由于多媒体传输的都是大量的数据，所以规定上传文件必须是post方法，<code>&lt;input&gt;</code>的type属性必须是file。</p>
+</div><div id="MySignature" style="display: block;"><div id="xzwblogSignature">    
+        <div>作者：<a href="http://www.cnblogs.com/xzwblog/" target="_blank">何必等明天</a></div>
+        <div>出处：<a href="http://www.cnblogs.com/xzwblog/" target="_blank">http://www.cnblogs.com/xzwblog/</a></div>
+        <div>欢迎转载，但未经作者同意必须保留此段声明，否则保留追究法律责任的权利.</div>  
+    </div></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory">分类: <a href="http://www.cnblogs.com/xzwblog/category/993332.html" target="_blank">Java基础知识</a>,<a href="http://www.cnblogs.com/xzwblog/category/993343.html" target="_blank">计算机基础与TCP/IP</a></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info"><div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(6932870,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+            <a id="green_channel_follow" onclick="follow(&#39;e2639482-f52b-e711-9fc1-ac853d9f53cc&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./URL的编码和解码 - 何必等明天 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./URL的编码和解码 - 何必等明天 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/xzwblog/" target="_blank"><img src="./URL的编码和解码 - 何必等明天 - 博客园_files/20170428192344.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/xzwblog/">何必等明天</a><br>
+            <a href="http://home.cnblogs.com/u/xzwblog/followees">关注 - 0</a><br>
+            <a href="http://home.cnblogs.com/u/xzwblog/followers">粉丝 - 2</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;e2639482-f52b-e711-9fc1-ac853d9f53cc&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(6932870,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(6932870,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="http://www.cnblogs.com/xzwblog/p/6915213.html" class="p_n_p_prefix">« </a> 上一篇：<a href="http://www.cnblogs.com/xzwblog/p/6915213.html" title="发布于2017-05-29 09:45">JS的简单用法</a><br><a href="http://www.cnblogs.com/xzwblog/p/6917960.html" class="p_n_p_prefix">» </a> 下一篇：<a href="http://www.cnblogs.com/xzwblog/p/6917960.html" title="发布于2017-05-29 14:35">HTTP协议</a><br></div>
+</div>
+
+
+		</div>
+		<div class="postDesc">posted @ <span id="post-date">2017-05-29 13:32</span> <a href="http://www.cnblogs.com/xzwblog/">何必等明天</a> 阅读(<span id="post_view_count">1031</span>) 评论(<span id="post_comment_count">0</span>)  <a href="https://i.cnblogs.com/EditPosts.aspx?postid=6932870" rel="nofollow">编辑</a> <a href="https://www.cnblogs.com/xzwblog/p/6932870.html#" onclick="AddToWz(6932870);return false;">收藏</a></div>
+	</div>
+	<script src="./URL的编码和解码 - 何必等明天 - 博客园_files/highlight.min.js.下载"></script><script>markdown_highlight();</script><script type="text/javascript">var allowComments=true,cb_blogId=352096,cb_entryId=6932870,cb_blogApp=currentBlogApp,cb_blogUserGuid='e2639482-f52b-e711-9fc1-ac853d9f53cc',cb_entryCreatedDate='2017/5/29 13:32:00';loadViewCount(cb_entryId);var cb_postType=1;</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/xzwblog/p/6932870.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/xzwblog/p/6932870.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万VC++源码: 大型工控、组态\仿真、建模CAD源码2018！</a><br><a href="https://dnspod.cloud.tencent.com/act/weapp?fromSource=gwzcw.741360.741360.741360" target="_blank">【腾讯云】小程序普惠节精美模板1元起</a><br></div>
+<div id="opt_under_post"></div>
+<div id="cnblogs_c1" class="c_ad_block"><a href="https://cloud.tencent.com/act/first_purchase?fromSource=gwzcw.741358.741358.741358" target="_blank"><img width="300" height="250" src="./URL的编码和解码 - 何必等明天 - 博客园_files/24442-20180122123322209-1359966176.jpg" alt="tencent0122"></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="https://news.cnblogs.com/n/588393/" target="_blank">ofo与摩拜单车计划首度进入拉美市场 在墨西哥推出服务</a><br> ·  <a href="https://news.cnblogs.com/n/588391/" target="_blank">马云：中国500强未来会有200个CEO，来自阿里巴巴</a><br> ·  <a href="https://news.cnblogs.com/n/588392/" target="_blank">垮掉的广场舞创业：大爷大妈们的钱为什么不好赚？</a><br> ·  <a href="https://news.cnblogs.com/n/588390/" target="_blank">TensorFlow 1.5.0正式发布，添加多项功能和支持</a><br> ·  <a href="https://news.cnblogs.com/n/588389/" target="_blank">Chrome OS的分屏功能或支持与安卓应用程序一起运行</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<div id="cnblogs_c2" class="c_ad_block"><a href="http://click.aliyun.com/m/34770/" target="_blank"><img width="468" height="60" src="./URL的编码和解码 - 何必等明天 - 博客园_files/24442-20171208101900738-116140477.jpg" alt="阿里云C2-1208"></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="http://kb.cnblogs.com/page/586236/" target="_blank">领域驱动设计在互联网业务开发中的实践</a><br> ·  <a href="http://kb.cnblogs.com/page/585502/" target="_blank">步入云计算</a><br> ·  <a href="http://kb.cnblogs.com/page/531409/" target="_blank">以操作系统的角度述说线程与进程</a><br> ·  <a href="http://kb.cnblogs.com/page/141729/" target="_blank">软件测试转型之路</a><br> ·  <a href="http://kb.cnblogs.com/page/177402/" target="_blank">门内门外看招聘</a><br></div>» <a href="http://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"></div>
+<script type="text/javascript">
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	<div id="blog-news"><script type="text/javascript">window['__document_write_ajax_callbacks__']['3']();</script><script language="javascript" type="text/javascript">window['__document_write_ajax_callbacks__']['1']();</script><div id="profile_block">昵称：<a href="https://home.cnblogs.com/u/xzwblog/">何必等明天</a><br>园龄：<a href="https://home.cnblogs.com/u/xzwblog/" title="入园时间：2017-04-28">8个月</a><br>粉丝：<a href="https://home.cnblogs.com/u/xzwblog/followers/">2</a><br>关注：<a href="https://home.cnblogs.com/u/xzwblog/followees/">0</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="follow(&#39;e2639482-f52b-e711-9fc1-ac853d9f53cc&#39;)">+加关注</a></div><script type="text/javascript">window['__document_write_ajax_callbacks__']['4']();</script><script>window['__document_write_ajax_callbacks__']['2']();</script></div></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="calendar"><div id="blog-calendar" style="display:none"></div><script type="text/javascript">loadBlogDefaultCalendar();</script></div>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block"></div><div id="sidebar_toptags" class="sidebar-block">
+<div class="catListTag">
+<h3 class="catListTitle">我的标签</h3>
+<ul>
+<li><a href="http://www.cnblogs.com/xzwblog/tag/MyBatis/">MyBatis</a>(3)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/SSM/">SSM</a>(3)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%AE%97%E6%B3%95/">大数据算法</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/">代理模式</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/">面向对象</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/">配置文件</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/Redis/">Redis</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/slf4j/">slf4j</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/Spring%20Boot/">Spring Boot</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/HTTP/">HTTP</a>(1)</li><li><a href="http://www.cnblogs.com/xzwblog/tag/">更多</a></li>
+</ul>
+</div></div><div id="sidebar_categories">
+<div class="catListPostCategory">
+<h3 class="catListTitle">随笔分类<span style="font-size:11px;font-weight:normal">(58)</span></h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_0_Link_0" href="http://www.cnblogs.com/xzwblog/category/993332.html">Java基础知识(7)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_1" href="http://www.cnblogs.com/xzwblog/category/993333.html">Java进阶(6)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_2" href="http://www.cnblogs.com/xzwblog/category/993338.html">JVM(7)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_3" href="http://www.cnblogs.com/xzwblog/category/993340.html">Linux(1)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_4" href="http://www.cnblogs.com/xzwblog/category/993335.html">必备框架(6)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_5" href="http://www.cnblogs.com/xzwblog/category/1056512.html">测评题目</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_6" href="http://www.cnblogs.com/xzwblog/category/1040089.html">多线程(8)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_7" href="http://www.cnblogs.com/xzwblog/category/993343.html">计算机基础与TCP/IP(5)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_8" href="http://www.cnblogs.com/xzwblog/category/993891.html">零碎知识(2)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_9" href="http://www.cnblogs.com/xzwblog/category/1061358.html">面试准备</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_10" href="http://www.cnblogs.com/xzwblog/category/993341.html">前端(2)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_11" href="http://www.cnblogs.com/xzwblog/category/993339.html">设计模式(1)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_12" href="http://www.cnblogs.com/xzwblog/category/993337.html">数据结构与算法(4)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_13" href="http://www.cnblogs.com/xzwblog/category/993334.html">数据库(8)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_14" href="http://www.cnblogs.com/xzwblog/category/1012124.html">项目(1)</a> </li>
+
+</ul>
+
+</div>
+
+<div class="catListPostArchive">
+<h3 class="catListTitle">随笔档案<span style="font-size:11px;font-weight:normal">(50)</span></h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_1_Link_0" href="http://www.cnblogs.com/xzwblog/archive/2017/08.html">2017年8月 (3)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_1" href="http://www.cnblogs.com/xzwblog/archive/2017/07.html">2017年7月 (17)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_2" href="http://www.cnblogs.com/xzwblog/archive/2017/06.html">2017年6月 (9)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_3" href="http://www.cnblogs.com/xzwblog/archive/2017/05.html">2017年5月 (18)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_4" href="http://www.cnblogs.com/xzwblog/archive/2017/04.html">2017年4月 (3)</a> </li>
+
+</ul>
+
+</div>
+
+<div class="catList">
+<h3 class="catListTitle">我的链接</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_2_Link_0" href="https://github.com/Zhenweicsdn" rel="nofollow" target="_blank">lz的GitHub</a> </li>
+
+</ul>
+
+</div>
+
+</div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<div class="catListView">
+<h3 class="catListTitle">阅读排行榜</h3>
+	<div id="TopViewPostsBlock"><ul><li><a href="http://www.cnblogs.com/xzwblog/p/6789380.html">1. SpringBoot的几个使用技巧(3799)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6834663.html">2. HTTP认证方式与https简介(2400)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6796846.html">3. Mybatis基本用法--中(1647)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6906167.html">4. Java的绝对路径和相对路径(1637)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6791412.html">5. Mybatis基本用法--上(1262)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6912320.html">6. 如何用CropBox实现头像裁剪并与java后台交互(1069)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6932870.html">7. URL的编码和解码(1031)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/7047849.html">8. 数据库主键冲突解决(942)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/6928371.html">9. java压缩包上传，解压，预览(利用editor.md和Jstree实现)和下载(861)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/7127362.html">10. 大数据算法(788)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div class="RecentComment">
+	<div id="TopDiggPostsBlock"><ul><li><a href="http://www.cnblogs.com/xzwblog/p/7289952.html">1. 自学Java HashMap源码(1)</a></li><li><a href="http://www.cnblogs.com/xzwblog/p/7193912.html">2. 反射消除String类对象的不可变特性(1)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	<div id="newDiv"><a name="_labelTop"></a><div id="navCategory"><p style="text-align:center;color:#FFF9FD;font-size:20px"><b>目录</b></p><ul><li><a style="color:#FFF9FD;font-size:13px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label0">&nbsp;&nbsp;1 为什么要URL编码</a></li><li><a style="color:#FFF9FD;font-size:13px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label1">&nbsp;&nbsp;2 如何编码</a></li><li><ul><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label1_0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ 2.1 JS的三种编码函数</a></li><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label1_1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ encodeURIComponent函数（推荐使用）</a></li><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label1_2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ 2.2 我们的问题</a></li><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label1_3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ 2.3 Java的URLEncoder.encode("需要编码的参数","UTF-8")</a></li></ul></li><li><a style="color:#FFF9FD;font-size:13px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label2">&nbsp;&nbsp;3 为什么两次编码</a></li><li><ul><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label2_0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ 两次编码的原因：</a></li></ul></li><li><a style="color:#FFF9FD;font-size:13px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label3">&nbsp;&nbsp;4 扩展</a></li><li><ul><li><a style="color:blue;font-size:11px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#_label3_0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;♦ 什么是application/x-www-form-urlencoded</a></li></ul></li></ul></div><p>&nbsp;</p></div><div id="newDiv2"><div style="text-align: center"><a style="color:#ff002f;font-size:10px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#top">回到顶部</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style="color:#ff002f;font-size:10px" href="https://www.cnblogs.com/xzwblog/p/6932870.html#" onclick="AddToWz(6783037);return false;">收藏</a>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="button1" value="隐藏目录" onclick="Show_Hidden(newDiv)"></div></div></div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright ©2018 何必等明天
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+<script type="text/javascript">
+
+    // ref: http://www.cnblogs.com/wangqiguo/p/4355032.html
+    // 生成目录索引列表
+    function GenerateContentList()
+    {
+        var mainContent = $('#cnblogs_post_body');
+        var h2_list = $('#cnblogs_post_body h2');//如果你的章节标题不是h2,只需要将这里的h2换掉即可
+
+        if(mainContent.length < 1)
+            return;
+
+        if(h2_list.length>0)
+        {
+            var content = '<a name="_labelTop"></a>';
+            content += '<div id="navCategory">';
+            content += '<p style="text-align:center;color:#FFF9FD;font-size:20px"><b>目录</b></p>';
+            content += '<ul>';
+            for(var i=0; i<h2_list.length; i++)
+            {
+                $(h2_list[i]).before('<a name="_label'+ i+'"></a>');
+                content += '<li><a style="color:#FFF9FD;font-size:13px" href="#_label' + i + '">&nbsp;&nbsp;'+$(h2_list[i]).text() + '</a></li>';
+                var h3_list = $(h2_list[i]).nextAll("h3");
+                var li3_content = '';
+                for(var j=0; j<h3_list.length; j++)
+                {
+                    var tmp = $(h3_list[j]).prevAll('h2').first();
+                    if(!tmp.is(h2_list[i]))
+                        break;
+                    var li3_anchor = '<a name="_label' + i + '_' + j + '"></a>';
+                    $(h3_list[j]).before(li3_anchor);
+                    li3_content += '<li><a style="color:blue;font-size:11px" href="#_label' + i + '_' + j + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9830; '+$(h3_list[j]).text() + '</a></li>';
+                }
+
+                var li2_content = '';
+                if(li3_content.length > 0){
+                    li2_content = '<li><ul>' + li3_content + '</ul></li>';
+ //                   li2_content +='<br />'
+                }
+                content += li2_content;
+            }
+            
+            content += '</ul>';
+            content += '</div><p>&nbsp;</p>';
+            if($('#sideBar').length != 0 )
+            {
+                var parent = document.getElementById("sideBar");
+                //添加 div
+                var div = document.createElement("div");
+
+                //设置 div 属性，如 id
+                div.setAttribute("id", "newDiv");
+                div.innerHTML = content;
+                parent.appendChild(div);
+                var div2 = document.createElement("div");
+                div2.setAttribute("id", "newDiv2");
+                div2.innerHTML ='<div style="text-align: center"><a style="color:#ff002f;font-size:10px" href="#top">回到顶部</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style="color:#ff002f;font-size:10px" href="#" onclick="AddToWz(6783037);return false;">收藏</a>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id ="button1" value="隐藏目录" onclick="Show_Hidden(newDiv)" /></div>';
+                parent.appendChild(div2);
+                
+            }
+        }
+    }
+
+    GenerateContentList();
+
+    //点击隐藏，再点击显示
+    function Show_Hidden(trid){
+        if(trid.style.display=="none"){
+            trid.style.display='block';
+            document.getElementById('button1').value="隐藏目录";
+        }else{
+            trid.style.display='none';
+            document.getElementById('button1').value="显示目录";
+
+        }
+    }
+
+</script><script type="text/javascript">getFollowStatus('e2639482-f52b-e711-9fc1-ac853d9f53cc')</script></body></html>

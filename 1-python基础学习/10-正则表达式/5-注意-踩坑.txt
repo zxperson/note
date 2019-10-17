@@ -1,0 +1,8 @@
+
+1. 空的正则，匹配任何字符串，返回的结果是 空字符，而不是 匹配失败返回None
+
+In [2]: re.match(r"","123")
+Out[2]: <_sre.SRE_Match object; span=(0, 0), match=''>
+
+In [3]: re.match(r"","123")  == None
+Out[3]: False

@@ -1,0 +1,152 @@
+                                                描述符(descriptor) 简介
+
+1. 如果一个对象有如下三个魔法方法当中的任意一个，那么这个对象就是 descriptor对象。只有新式类才有描述符。
+    三个魔法方法：__get__、 __set__、__delete__
+
+代码1(__get__方法)；
+class Animal(object):
+    def __get__(self,obj,cls):
+        print(self)         # 会打印出 <__main__.Animal object at 0x7f5b33f75b38>
+        print(obj)          # 会打印出 <__main__.Person object at 0x7f5b33f7dbe0>  或者 None  
+        print(cls)          # 会打印出 <class '__main__.Person'>
+        if obj is None:
+            return '通过类访问'
+        else:
+            return '通过实例访问'
+
+class Person(object):
+    run = Animal()
+
+    def __init__(self,name):
+        self.name = name
+
+if __name__ == '__main__':
+
+    teacher = Person('laowang')
+    print(teacher.run)         # 打印 '通过实例访问'
+    print('-----------------分割线--------------------------')
+    print(Person.run)          # 打印 '通过类访问'
+
+# 当执行 teacher.run ，访问teacher对象的run属性的时候，run 是一个descriptor对象，这时候会去调用 descriptor对象的 __get__方法，__get__方法的返回值就是run属性的值。
+# 当执行 Person.run, 和 teacher.run 不同的是：__get__ 方法中 obj参数 为 None
+
+代码1（第二个版本）：
+class classonlymethod(classmethod):
+    def __get__(self, instance, cls=None):
+        print("---test----")
+        print(instance)
+        if instance is not None:
+            raise AttributeError("这个描述符只允许类对象访问！！！")
+        return super(classonlymethod, self).__get__(instance, cls)
+
+
+class Hehe(object):
+
+    @classonlymethod  # test = classonlymethod(test)
+    def test(cls):
+        print("哈哈")
+
+if __name__ == '__main__':
+    t = Hehe()
+    # t.test()
+    Hehe.test()
+
+# 注意: 类属性和类方法实际上都属于类属性。 类方法实际就是 可调用的类属性。
+
+代码2(__set__方法)：
+class Animal(object):
+    def __set__(self,obj,value):
+        print(self)    #打印 <__main__.Animal object at 0x7fb5668dbbe0>
+        print(obj)     #打印 <__main__.Person object at 0x7fb5668dbc50>
+        print(value)   #打印 100
+        print('test')
+
+class Person(object):
+    run = Animal()
+
+    def __init__(self,name):
+
+        self.name = name
+
+if __name__ == '__main__':
+
+    teacher = Person('laowang')
+    teacher.run = 100
+    print(teacher.run)   # 打印 <__main__.Animal object at 0x7fb5668dbbe0>
+
+
+2.  如果一个对象同时有 __get__ 和 __set__ ，这样的对象，我们称之为 data descriptor 对象。
+    如果一个对象只有 __get__ , 这样的对象，我们称之为 non-data descriptor 对象。
+
+    代码1：
+        class Animal(object):
+            a = 300
+
+        class Person(Animal):
+            #a = 200
+            def __init__(self):
+                #self.a = 100
+                self.b = 'abc'
+
+
+        laowang = Person()
+        print(laowang.a)
+
+    # 一般情况下，访问一个实例对象的属性，例如 laowang.a  会先从 laowang.__dict__ 这个字典中查找，如果没有找到会去 Person.__dict__ 字典中查找
+    # 如果还是没有找到，会去 Animal类的字典当中去找。 如果Person类当中的 a 这个类属性指向一个 描述符对象，并且实例对象也有 a 这个实例属性，那么
+    # 这种情况下，不一定按照上面的顺序去查找。
+
+    代码2：
+        class Animal(object):
+            def __get__(self,obj,cls):
+                print(self)         # 会打印出 <__main__.Animal object at 0x7f5b33f75b38>
+                print(obj)          # 会打印出 <__main__.Person object at 0x7f5b33f7dbe0>    
+                print(cls)          # 会打印出 <class '__main__.Person'>
+                return '我是__get__的返回值'
+
+        class Person(object):
+            run = Animal()
+
+            def __init__(self,name):
+                self.run = 100
+                self.name = name
+
+        if __name__ == '__main__':
+
+            teacher = Person('laowang')
+            print(teacher.run)         # 打印 100
+
+        # 如果 描述符对象 只有 __get__方法，那么 属性查找时 会优先去 teacher.__dict__ 这个字典中搜索。
+        # 也就是说 优先去 实例对象的字典中搜索。
+
+    代码2：
+        class Animal(object):
+            def __get__(self,obj,cls):
+                print(self)         # 会打印出 <__main__.Animal object at 0x7f5b33f75b38>
+                print(obj)          # 会打印出 <__main__.Person object at 0x7f5b33f7dbe0>    
+                print(cls)          # 会打印出 <class '__main__.Person'>
+                return '我是__get__的返回值'
+
+            def __set__(self,obj,value):
+                pass
+
+        class Person(object):
+            run = Animal()
+
+            def __init__(self,name):
+                self.run = 100
+                self.name = name
+
+        if __name__ == '__main__':
+
+            teacher = Person('laowang')
+            print(teacher.run)    # 打印 '我是__get__的返回值'        
+
+         # 如果 描述符对象 有__get__和__set__两个方法，那么 属性查找时 会优先去 Person.__dict__ 这个字典中搜索。
+         # 也就是说，优先去 类对象的字典中搜索，但是run属性指向一个 data-descriptor ，所有 又会调用 __get__方法。
+
+
+    对于实例对象来说，任意的 属性访问，内部实现的机制是 object.__getattribute__ ,
+    属性搜索的优先级是：data-descriptor > 实例对象的字典 > non-descriptor > __getattr__,我们可以自定义 __getattribute__ 去更改默认的优先级。 
+
+    对于类来说，类属性的访问，内部实现机制是 type.__getattribute__  .

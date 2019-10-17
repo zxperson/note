@@ -1,0 +1,304 @@
+                                                                    python学科第一阶段第三次串讲
+
+
+一、直播名称；Python面向对象编程
+二、直播时长：120分钟
+三、直播目标：
+    深入了解文件操作和面对对象
+
+四：教学内容：
+
+    文件的打开 以文本方式和以二进制方式 打开的区别
+    super工作原理
+    面试题（递归函数）
+
+
+1.
+    1）. 文件的打开 以文本方式和以二进制方式 打开有什么区别？
+        demo_1:
+            In [1]: f = open('itcast.py','rb')
+
+            In [2]: s = f.read()
+
+            In [3]: print(s)
+            123
+            456
+            789
+
+        demo_2:
+            In [1]: f = open('itcast.py','rb')
+
+            In [2]: s = f.read()
+
+            In [3]: print(s)
+            b'123\n456\n789\n'
+
+    注意：read(int)
+        1. 以文本方式打开：读多少个字符。
+        2. 以 二进制方式打开：读多少字节。
+
+    2）open函数中 encoding参数的作用。
+        用来指定编码。
+
+        编码：
+        ASCII码、 utf-8、      GBK、     unicode
+                  linux       windows
+        中-----11100
+        国-----11111
+
+        # 以Python3为例，以文本方式打开，读出来的数据是 str 类型。以二进制方式打开，读出来的数据是 bytes类型。
+        # 除了，读到的数据类型不同外，当我们打印时，对于换行符的处理也是不同的。
+        # 打开 图片、视频等 非文本数据的时候，推荐使用二进制方式打开。
+
+    2）. 文件的定位读写，Python2和Python3有何区别？ （不讲，实际用的不多）
+
+        在读写文件的过程中，会有一个指针（索引），指向的是将要被读取的那个字符，可以使用tell()来获取。
+
+        特别注意：
+            In [1]: f = open('itcast.py','r')
+
+            In [2]: s = f.read()
+
+            In [3]: s
+            Out[3]: 'abcd1234\n'
+
+            In [4]: f.tell()
+            Out[4]: 9
+
+            # 文件当中只写了 'abc1234' 读取出来后多了 '\n'
+            #  '\n' 是一个 字符。
+            # 这两个特点在 Python2和Python3中是一样的
+
+
+        如果在读写文件的过程中，需要从另外一个位置进行操作的话，可以使用seek()
+
+        seek(offset, from)有2个参数:
+            offset: 偏移量，正数代表往右移动，负数代表往左移动。
+            from: 指针从哪里开始移动
+                0:表示文件开头
+                1:表示当前位置
+                2:表示文件末尾
+
+            注意点：In text files (those opened without a b in the mode string),
+            only seeks relative to the beginning of the file are allowed (the exception being seeking to the very file end with seek(0, 2)).
+
+        Python2测试：
+            In [1]: f = open('itcast.py','r')
+
+            In [2]: f.read()
+            Out[2]: 'abcd1234\n'
+
+            In [3]: f.tell()
+            Out[3]: 9
+
+            In [4]: f.seek(1,0)
+
+            In [5]: f.tell()
+            Out[5]: 1
+
+            In [6]: f.seek(-1,1)
+
+            In [7]: f.tell()
+            Out[7]: 0
+
+            In [8]: f.seek(-1,2)
+
+            In [9]: f.tell()
+            Out[9]: 8
+
+            In [10]: f.read()
+            Out[10]: '\n'
+
+        # 经过测试 没有任何问题，正常使用。
+
+        python3测试：
+            In [1]: f = open('itcast.py','r')
+
+            In [2]: f.read()
+            Out[2]: 'abcd1234\n'
+
+            In [3]: f.tell()
+            Out[3]: 9
+
+            In [4]: f.seek(1,0)
+            Out[4]: 1
+
+            In [5]: f.seek(1,1)
+            ---------------------------------------------------------------------------
+            UnsupportedOperation                      Traceback (most recent call last)
+            <ipython-input-5-56ba192ae1dc> in <module>()
+            ----> 1 f.seek(1,1)
+
+            UnsupportedOperation: cant do nonzero cur-relative seeks
+
+            # 如何解决呢？用 二进制方式打开，就可以随意的移动指针了。
+
+    3）. 私有属性和方法能不能被访问？ （去掉不讲，课程里有）
+
+        代码：
+            class Person(object):
+
+                def __init__(self,name):
+                    self.name = name
+
+                def __get_name(self):
+                    print('name is %s'% self.name)
+
+            a = Person('xiao')
+            a.get_name()                #抛出异常
+            a.__get_name()              #抛出异常
+            a._Person__get_name()       #正常访问  #切记 不要这样使用
+            print(dir(a))               #查看实例对象的所有属性和方法
+
+        属性前面加了两个下划线，效果和方法前面加是一样的。名字重整。
+
+    4）. 私有属性和方法能不能被继承？ （去掉不讲，课程里有）
+
+        代码：
+            class A(object):
+                def __eat(self):
+                    print('--eat---')
+
+            class B(A):
+                pass
+
+            b = B()
+            b.eat()
+            b.__eat()
+            #b._A__eat()    #实际上，即便是私有的方法和属性，也是可以被继承的，只过，名字被更改了。
+            #print(dir(b))
+
+    5）. 子类重写了父类的方法，在子类中，有两种办法可以调用父类方法，有哪些区别？ （去掉不讲，课程里有）
+
+        两种方式：
+
+            class Animal(object):
+                def bark(self,color):
+                    self.color = color
+                    print('-----111111-----')
+
+            class Dog(Animal):
+                def bark(self,name,color):
+                    #Animal.bark(self,color)        ##注意参数的传递，python2和python3用法一样。
+                    super(Dog,self).bark(color)         ##python3中super后面的括号里 不要加参数，python2必须要加参数。
+                    print('-----222222--------')
+                    print(self.color)
+
+            d = Dog()
+            d.bark('wangcai','baise')
+
+多继承里 继承的优先顺序：
+代码：
+class D(object):
+    pass
+
+
+class E(object):
+    pass
+
+
+class F(object):
+    pass
+
+
+class C(D, F):
+    pass
+
+
+class B(E, D):
+    pass
+
+class A(B, C):
+    pass
+
+if __name__ == '__main__':
+    print(A.mro())    # 方法解析顺序表, 这个 顺序就是 继承的优先级顺序
+
+
+
+super 原理:
+
+super工作原理：
+    def super(cls,self):
+        mro = self.__class__.mro()
+        return mro[mro.index(cls) + 1]
+
+
+多继承里调用父类的方法：super()
+    class Base(object):
+        def __init__(self):
+            print('-----Base----')
+
+    class A(Base):
+        def __init__(self):
+            print('------A-----')
+            super().__init__()   -----> super(A,c)  ----->  B
+
+    class B(Base):
+        def __init__(self):
+            print('-----B----')
+            super().__init__()   ------> super(B,c) ----->  Base
+
+    class C(A,B):
+        def __init__(self):
+            print('----C----')
+            super().__init__()   -----> super(C,c) ----> A
+
+    c = C()
+    print(C.mro())    # 方法解析顺序表。实例对象在调用某个方法时，如果涉及到多继承，会按照这个表进行搜索。
+
+    注意 打印的结果:
+        '''
+        ----C----
+        ------A-----
+        -----B----
+        -----Base----
+        [<class '__main__.C'>, <class '__main__.A'>, <class '__main__.B'>, <class '__main__.Base'>, <class 'object'>]
+        '''
+
+另外一种,多继承里调用父类的方法：
+    class Base(object):
+        def __init__(self):
+            print('------Base--------')
+
+    class A(Base):
+        def __init__(self):
+            print('---A----')
+            Base.__init__(self)
+
+    class B(Base):
+        def __init__(self):
+            print('---------B---------')
+            Base.__init__(self)
+
+    class C(A,B):
+        def __init__(self):
+            print('------c---------')
+            A.__init__(self)
+
+    c = C()
+    print(C.__mro__)
+
+    打印结果：
+        '''
+        ------c---------
+        ---A----
+        ------Base--------
+        (<class '__main__.C'>, <class '__main__.A'>, <class '__main__.B'>, <class '__main__.Base'>, <class 'object'>)
+
+        '''
+
+ 2. 面试题：
+#      1）. 使用python如何读取一个大文件（例如10个G以上的日志文件）
+
+#             read （）的方法是一次性把文件的内容以字符串的方式读到内存， 放到一个字符串变量中
+
+#             readlines（）的方法是一次性读取所有内容， 并按行生成一个list
+
+#             因为read（）和readlines（）是一次性把文件加载到内存， 如果文件较大， 甚至比内存的大小还大， 内存就会溢出。 所以，这两种方法只适合读取小的文件。
+
+#             正确的方式是：
+#                 with open('test.txt','r') as f:
+#                     for line in f:
+#                         print(line)
+

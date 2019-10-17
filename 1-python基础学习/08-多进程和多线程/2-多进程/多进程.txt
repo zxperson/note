@@ -1,0 +1,486 @@
+1. fork 子进程
+
+代码：
+    import os
+    import time
+
+    n = 0
+    print('-----1------进程id是%d' % os.getpid())   #子进程不会执行
+    ret = os.fork()
+    if ret == 0:
+        for i in range(2):
+            print("----我是子进程----pid为%d" % os.getpid())
+            time.sleep(1)
+            print(n)
+            
+    else:
+        for i in range(2):
+            print("----我是父进程----pid为%d------ret的值为%d" % (os.getpid(),ret))
+            time.sleep(1)
+            print(n)
+    print('-------2------进程id是%d' % os.getpid())  #父进程和子进程都会执行
+
+
+    只有执行了 os.fork() 才会创建 子进程。在 父进程中 ret的值为 子进程的pid，在子进程中 ret的值为 0. 父进程和子进程 谁 先执行，是由 操作系统来决定的。
+    注意：全局变量在多个进程中 不共享。'读时共享，写时复制'
+
+2.使用 multiprocessing 模块 创建 子进程
+
+代码：
+    from multiprocessing import Process
+    import os
+    import time
+
+    def test(func_name,age,**kwargs):
+        for i in range(5):
+            print('---子进程---func_name=%s,age=%d,pid=%d'% (func_name, age, os.getpid()))
+            print(kwargs)
+            time.sleep(1)
+
+    if __name__ == "__main__":
+        p = Process(target=test,args=('test',18),kwargs={'m':20})
+        print('父进程--%d' % os.getpid())
+        p.start()
+        p.join()    # 父进程在遇到这个语句之后，会在这里暂停，等到子进程结束了，再继续执行。这个方法可以传一个参数，手动指定，父进程等待的时间，单位秒。
+        print('-----主进程马上退出-------')
+
+鉴于有些同学用windows系统使用 multiprocessing 模块，同样的一段代码，在 windows和linux上面运行，会有不同的结果：
+代码：
+    import os
+    from multiprocessing import Process
+    import multiprocessing as mp
+
+    def test():
+        print('----test--子进程id为%s--' % os.getpid())
+
+    if __name__ == '__main__':
+        p1 = Process(target=test)
+        print(os.getpid())
+        p1.start()
+        p1.join()
+
+    print('--main----进程id为%s-' % os.getpid())
+
+    在Linux系统中，执行结果：
+                                9128
+                                ----test--子进程id为9129--
+                                --main----进程id为9128-
+
+    在windows系统中，执行结果：
+                                4808
+                                --main----进程id为13456-       #子进程
+                                ----test--子进程id为13456--
+                                --main----进程id为4808-        #主进程
+
+    这是因为，在windows中，子进程在运行的时候会先把所有的代码重新导入并执行。如果不加if语句，会产生无限循环。
+    深入研究发现：在 unix操作系统中，默认创建子进程 用的是 os.fork()。
+                  在windows系统中，默认 创建子进程 用的是 spawn 。关于spawn 是什么，我们不去深入研究。
+
+                  在python3.4版本中：unix操作系统 添加了 spawn 这种 创建子进程 的方式。
+                  那么，如何更改 unix操作系统 默认 创建子进程的 方式呢？
+                  mp.set_start_method('spawn')  
+
+3. 使用 Process 子类创建 子进程
+
+代码：
+    from multiprocessing import Process
+    import time
+    import os
+
+    class MyProcess(Process):
+
+        def __init__(self, n):
+            Process.__init__(self)      
+            self.n = n
+                                    #注意 一定要 调用父类的方法
+
+        def run(self):
+            for i in range(self.n):
+                print('-子进程id为%d------i的值为%d---' % (os.getpid(),i))
+                time.sleep(1)
+
+    if __name__ == '__main__':
+        p = MyProcess(5)
+        p.start()
+        p.join()
+        print('-----主进程马上结束-----------')
+
+4. 终止进程
+
+代码：
+from multiprocessing import Process
+import time
+
+def slow_worker():
+    print("starting worker")
+    time.sleep(0.1)
+    print("Finished worker")
+
+if __name__ == "__main__":
+    p = Process(target=slow_worker)
+    print("BEFORE:", p, p.is_alive())
+
+    p.start()
+    print("DURING:", p, p.is_alive())
+
+    p.terminate()  # 终止子进程，内核发送了SIGTERM(15)信号，终止了进程。如果主进程调用了这个方法，主进程会终止，但是子进程不会终止，子进程就会变成孤儿进程。
+    print("TERMINATED:", p, p.is_alive())   # 如果在 关联的进程中使用这个方法，可能会导致 管道或者队列损坏。同样，如果进程获得了锁或者信号量，那么终止这个进程会导致其他进程陷入死锁。
+
+    p.join()    #回收资源。
+    print("JOINED:", p, p.is_alive())
+
+5. 进程的退出状态码
+
+子进程退出时生成的状态码可以通过 exitcode属性访问。具体请看下表：
+
+    退出码              含义
+
+    等于 0           未生成任何错误
+ 
+    大于 0           进程有一个错误，并以该错误码退出
+
+    小于 0           进程由 一个 -1*exitcode 信号结束
+
+代码：
+from multiprocessing import Process
+import time
+import sys
+
+def exit_error():
+    sys.exit(1)
+
+def exit_ok():
+    return
+
+def return_value():
+    return 1
+
+def raises():
+    raise RuntimeError("There was an error")
+
+def terminated():
+    time.sleep(3)
+
+if __name__ == "__main__":
+    jobs = []
+    for f in [exit_error,exit_ok,return_value,raises,terminated]:
+        print("starting process for", f.__name__)
+        j = Process(target=f, name=f.__name__)
+        jobs.append(j)
+        j.start()
+
+    jobs[-1].terminate()
+
+    for j in jobs:
+        j.join()
+        print("%s.exitcode = %s" % (j.name, j.exitcode))
+
+# 产生异常的 进程 退出状态码为 1.
+
+6. 日志
+
+代码：
+import multiprocessing
+import logging
+import sys
+
+def worker():
+    print("Doing some work")
+    sys.stdout.flush()
+
+if __name__ == "__main__":
+    multiprocessing.log_to_stderr(logging.DEBUG)
+    p = multiprocessing.Process(target=worker)
+    p.start()
+    p.join()
+
+# log_to_stderr() 使用logging模块建立了一个日志记录器对象，并增加一个处理程序，使得日志消息发送到标准错误通道。
+# 默认，日志的级别为 logging.NOTSET,即不产生任何消息。
+
+要直接处理日志记录器（修改日志级别或者添加处理程序），可以使用get_logger()
+
+代码：
+import multiprocessing
+import logging
+import sys
+
+def worker():
+    print("Doing some work")
+    sys.stdout.flush()
+
+if __name__ == "__main__":
+    multiprocessing.log_to_stderr()
+    logger = multiprocessing.get_logger()
+    logger.setLevel(logging.INFO)
+    p = multiprocessing.Process(target=worker)
+    p.start()
+    p.join()
+
+7. 进程池
+    
+代码：
+    from multiprocessing import Pool
+    import os
+    import time
+
+    def MyProcess(num):
+        print('-----num=%d----pid是%d----'%(num,os.getpid()))
+        time.sleep(1)
+
+    if __name__ == "__main__":
+        pool = Pool(3)
+        for i in range(10):
+            pool.apply_async(MyProcess, (i,))
+
+        pool.close()  #关闭 进程池，关闭后，任务不能再继续添加到进程池。
+        pool.join()   # 主进程，暂停，等待 所有任务完成。
+
+8. 进程间的通信--队列
+
+    能够用pickle序列化的任何对象都能通过Queue传递。
+
+    代码：
+        from multiprocessing import Process,Queue
+        from multiprocessing.queues import Empty
+
+        def write(q):
+            for value in [1,2,3,4,5]:
+                q.put(value)
+                print('---put %d to queue'%value)
+
+        def read(q):
+            while True:
+                try:
+                    value = q.get(False)   #如果加了False这个参数，队列为空后，直接抛出Empty这个异常。
+                    print('---get %d from queue' % value)
+                except Empty:              # 建议去看下 Empty 类的 源码，你会大吃一惊。
+                    print('---队列为空---')
+                    break
+
+        if __name__ == "__main__":
+            q = Queue()
+            p_write = Process(target=write,args=(q,))
+            p_read = Process(target=read,args=(q,))
+
+            p_write.start() 
+            p_write.join()
+ 
+            p_read.start()
+            p_read.join()
+
+9. 进程间--Event对象
+
+ 进程里的 Event对象 克隆自 threading.Event
+
+ 代码；
+import multiprocessing
+import time
+
+def wait_for_event(e):
+    print("wait_for_event: starting")
+    e.wait()
+    print("wait_for_event: e.is_set() ->",e.is_set())
+
+def wait_for_event_timeout(e, t):
+    print("wait_for_event_timeout: starting")
+    e.wait(t)
+    print("wait_for_event_timeout: e.is_set() ->",e.is_set())
+
+if __name__ == "__main__":
+    e = multiprocessing.Event()
+    w1 = multiprocessing.Process(name="block",target=wait_for_event,args=(e,))
+    w1.start()
+    w2 = multiprocessing.Process(name="nonblock",target=wait_for_event_timeout,args=(e, 2))
+    w2.start()
+    print("main: waiting before calling Event.set()")
+    time.sleep(3)
+    e.set()
+    print("main:event is set")
+
+
+10. 控制资源访问
+    如果需要在多个进程间共享一个资源，在这种情况下可以使用一个Lock来避免访问冲突。
+
+    保证同一时间只有一个进程在使用标准输出。
+    未加锁代码：
+        from multiprocessing import Process, Lock
+
+        def f(num):
+            print('hello world', num)
+            for j in range(1000):
+                print('----test----',num,j)
+
+        if __name__ == '__main__':
+
+            for num in range(10):
+                Process(target=f, args=(num,)).start()
+
+    加锁代码：
+        from multiprocessing import Process, Lock
+
+        def f(l, num):
+            l.acquire()                     #  默认 没有获得锁 之前会无限阻塞。获的锁之后，返回True。 
+            try:                            #  timeout参数可以指定 超时时间，超时时间过了就会解阻塞。默认是None，无限阻塞，直到获取到锁。如果设置为 负数，相当于设置为 0。
+                print('hello world', num)    # block = False ，获得锁之前 不会阻塞，返回值False。获的锁之后 返回值是True。
+                for i in range(1000):       # 当blocking=False时，禁止设置超时时间。
+                    print('----test----',num,i)
+            finally:
+                l.release()  
+
+        if __name__ == '__main__':
+            lock = Lock()
+
+            for num in range(10):
+                Process(target=f, args=(lock, num)).start()
+
+11. 同步操作--Condition
+
+进程中的Condition 是 threading.Condition的 一个别名。
+需要注意的是，创建对象的时候，如果要指定锁的类型，需要从 multiprocessing模块中导入。
+
+代码：
+import multiprocessing
+import time
+
+def stage_1(cond):
+    name = multiprocessing.current_process().name
+    print("starting:",name)
+    with cond:
+        print("%s done and ready for stage 2" % name)
+        cond.notify_all()
+
+def stage_2(cond):
+    name = multiprocessing.current_process().name
+    print("starting:",name)
+    with cond:
+        cond.wait()
+        print("%s running" % name)
+
+if __name__ == "__main__":
+    condition = multiprocessing.Condition()
+    s1 = multiprocessing.Process(name="s1",target=stage_1,args=(condition,))
+    s2_clients = [multiprocessing.Process(name="stage_2[%d]" % i,target=stage_2,args=(condition,)) for i in range(1,3)]
+
+    for c in s2_clients:
+        c.start()
+        time.sleep(1)
+
+    s1.start()
+
+    s1.join()
+    for c in s2_clients:
+        c.join()
+
+12. 控制资源的并发访问--信号量(Semaphore)
+
+   有时候可能需要允许多个进程同时访问一个资源，但是要限制总数。例如，连接池支持同时连接，但是数目是固定的，或者一个网络应用支持固定数目的并发下载。
+
+   进程中的信号量，实际上模拟的线程里的信号量。
+
+   注意：Semaphore.acquire()第一个参数是 block, 和 multiprocessing.Lock.acquire()中的 block 作用相同。
+
+   注意：如果主线程通过调用 BoundedSemaphore.acquire()、Lock.acquire()、RLock.acquire()、Semaphore.acquire()、Condition.acquire() 或者 Condition.wait() 处于阻塞状态，
+         此时，如果主线程接收到 SIGINT信号（Ctrl+C），主线程会立即中断，并且抛出 KeyboardInterrupt 异常。
+
+         如果使用threading模块，相同的情况下，SIGINT信号 会被忽略。
+
+
+
+
+
+
+
+
+
+
+
+
+Managers
+
+python可以通过manager方式 实现多个无关联的进程共享数据。
+
+Manager是一种较为高级的多进程通信方式，它能共享python支持的任何数据类型。包括：字典，列表等等。
+原理：先启动一个Manager服务进程，这个进程是阻塞的，它监听一个socket，然后其他进程（Manager客户端进程）通过socket来连接到服务进程，实现通信。
+
+Managers 提供了一种方式创建可以在不同进程之间共享的数据。包括通过网络，在不同的电脑上运行的进程之间的数据共享。
+一个manager对象控制了一个服务进程，这个进程用来管理共享对象（共享数据）。其他进程可以通过一个代理来访问共享对象。
+
+manager对象的服务进程会立即关闭，当垃圾回收或者父进程退出的时候。manager对象相关的类 定义在 multiprocessing.managers 模块中。
+
+1). multiprocessing.managers.BaseManager([address],[authkey])
+    创建一个 BaseManager 对象。
+    一旦创建了这个对象，你应该调用这个对象的 start() 或者 get_server().server_forever()方法，确保对象引用了一个已启动的管理进程。
+
+    address参数指定 Manager服务进程 监听的ip和端口，如果不指定，默认监听所有的ip和端口。
+    authkey参数是 验证秘钥。秘钥用来检查 连接到 服务进程的 客户端进程的有效性。如果设置，必须设置成 byte类型字符串。如果不设置，默认使用current_process().authkey
+
+
+2). multiprocessing.managers.SyncManager
+    BaseManager类的 子类。用于进程同步。multiprocessing.Manager() 会返回这个对象。
+
+    这个对象的实例方法会创建和返回一个代理对象，这个代理对象是 python里的数据类型（例如：列表，字典等等。） 这个数据就相当于共享对象（原始数据存在于Manager服务进程里）
+
+
+
+
+
+
+僵尸进程：子进程结束之后，父进程结束之前。这个阶段，子进程是 僵尸进程
+          但是如果父进程是一个循环，子进程 就会 一直保持 僵尸状态。
+          僵尸进程会一直占用进程号。我们知道 进程号是有限的。
+
+        代码：
+            from multiprocessing import Process
+            import time
+
+            def test():
+                print('---start----')
+                time.sleep(2)
+                print('-----end---')
+
+            for i in range(3):
+                p = Process(target=test)
+                p.start()
+
+            time.sleep(30)
+            print('主进程结束')
+
+        #执行程序，然后另外打开一个终端：ps aux |grep Z ，查看僵尸进程
+
+孤儿进程：父进程结束了，子进程称之为 孤儿进程。孤儿进程是操作系统的 1号 进程来负责一切善后工作。孤儿进程是没有危害的。
+
+守护进程（了解）:
+    守护进程(Daemon)也称为精灵进程是一种生存期较长的一种进程。
+    它们独立于控制终端并且周期性的执行某种任务或等待处理某些发生的事件。
+    他们常常在系统引导装入时启动，在系统关闭时终止。
+    unix系统有很多守护进程，大多数服务器都是用守护进程实现的。
+
+        代码：
+            from multiprocessing import Process
+            import time
+
+            def test():
+                print('---start----')
+                time.sleep(2)
+                print('-----end---')
+
+            for i in range(3):
+                p = Process(target=test)
+                p.daemon = True    #把 p进程 设置为 守护进程
+                p.start()
+                p.join()           #一定要加join，否则，主进程执行完代码之后，会直接退出，并且会结束子进程。
+
+
+            print('主进程结束')
+
+
+
+
+
+
+
+
+
+
+
+

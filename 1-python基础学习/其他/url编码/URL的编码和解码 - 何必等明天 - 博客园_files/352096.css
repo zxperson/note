@@ -1,0 +1,82 @@
+/* 作者签名 */
+#xzwblogSignature
+{ 
+border-top: #e0e0e0 1px dashed;
+border-right: #e0e0e0 1px dashed;
+border-bottom: #e0e0e0 1px dashed;
+border-left: #e0e0e0 1px dashed;
+padding-top: 10px;
+padding-right: 10px;
+padding-bottom: 10px;
+padding-left: 60px;
+font-family: 微软雅黑;
+font-size:11px;
+background-color:rgba(0,0,0,0.1)
+
+}
+#xzwblogSignature div
+{
+line-height: 25px;
+}
+/* 导航栏 */
+#navList {
+    float: left;
+    font-size: 18px;
+}
+#navList a:hover {
+    color: #4C9ED9;
+}
+/* 博客标题，其实是名字*/
+#blogTitle {
+    height: 80px;
+    clear: both;
+    color: #4c4f8b;
+    font-size: 20px;
+}
+/* 目录 */
+#newDiv {
+    left:20px; 
+    bottom:30px; 
+    width:250px;
+    height:auto;
+    max-height:400px;
+    overflow:auto;
+    overflow-y :auto;
+    font-family: 微软雅黑,Helvetica,Verdana,Arial,sans-serif;
+    position:fixed;
+    background-color:gray;
+    border-radius:7px;
+}
+#newDiv2 {
+    left:30px; 
+    bottom:10px; 
+    font-family: 微软雅黑,Helvetica,Verdana,Arial,sans-serif;
+    position:fixed;
+}
+/* 二级标题阴影 */
+h2 {
+    background-color:gray;
+    border-radius:7px;
+    color:#FFF9FD;
+}
+/* 不显示系统默认标题*/
+.postTitle {
+    display:none;
+}
+/* 侧边栏我的标签，随笔分类等的背景*/
+.catListTitle {
+    background-color:gray;
+    border-radius:7px;
+    color:#FFF9FD;
+}
+/* 好文要顶，关注我等的背景*/
+#blog_post_info {
+    background-color:rgba(0,0,0,0.2);
+    border-radius:7px;
+}
+/* 隐藏或显示目录的按钮*/
+#button1 {
+border:none;
+color:#ff002f;
+font-size:10px;
+}

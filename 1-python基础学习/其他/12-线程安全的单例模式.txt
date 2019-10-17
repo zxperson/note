@@ -1,0 +1,179 @@
+
+一.首先 复习下 单例对象仅仅初始化一次的代码：
+
+class Person(object):
+
+    __instance = None
+    __init_flag = False
+
+    def __new__(cls,name):
+        if cls.__instance == None:
+            cls.__instance = object.__new__(cls)
+            return cls.__instance
+
+        else:
+            return cls.__instance
+
+    def __init__(self,name):
+        if Person.__init_flag == False:
+            self.name = name
+            Person.__init_flag = True
+
+
+二. 多个 线程同时 创建对象
+from threading import Thread
+import random
+import time
+
+class Person(object):
+
+    __instance = None
+    __init_flag = False
+
+    def __new__(cls,name):
+        if cls.__instance == None:
+            time.sleep(random.random())    #这里 需要加延时，产生线程不安全的效果，不然看不到效果。
+            cls.__instance = object.__new__(cls)
+            return cls.__instance
+
+        else:
+            return cls.__instance
+
+    def __init__(self,name):
+        if Person.__init_flag == False:
+            self.name = name
+            Person.__init_flag = True
+
+def test_thread():
+    """打印单例对象的id"""
+    print(id(Person("小明")))
+
+if __name__ == '__main__':
+
+    for i in range(10):
+        Thread(target=test_thread).start()
+
+此时，可以看到，这个单例对象是 线程不安全的。
+
+三. 在__new__方法中加上线程锁
+from threading import Thread,Lock
+import random
+import time
+
+m = Lock()
+
+class Person(object):
+
+    __instance = None
+    __init_flag = False
+
+    def __new__(cls,name):
+        if cls.__instance == None:
+            time.sleep(random.random())
+            m.acquire()
+            cls.__instance = object.__new__(cls)
+            m.release()
+            return cls.__instance
+
+        else:
+            return cls.__instance
+
+    def __init__(self,name):
+        if Person.__init_flag == False:
+            self.name = name
+            Person.__init_flag = True
+
+def test_thread():
+    """打印单例对象的id"""
+    print(id(Person("小明")))
+
+if __name__ == '__main__':
+
+    for i in range(10):
+        Thread(target=test_thread).start()
+
+此时加了锁之后，发现 没有作用，依然是线程不安全的。问题出在哪里？
+
+假设1号线程在随机延时的时候，发生了线程调度，切换到了2号线程开始执行，2号线程随机延时的时间比较短,把所有的代码执行完了，创建了对象a，打印到屏幕。
+2号线程结束之后，1号线程继续执行，又创建了一个对象b。导致了 线程不安全。
+
+
+四. 在加锁之后，再去判断 __instance 这个类属性，也就是说 要判断两次。
+from threading import Thread,Lock
+import random
+import time
+
+m = Lock()
+
+class Person(object):
+
+    __instance = None
+    __init_flag = False
+
+    def __new__(cls,name):
+        if cls.__instance == None:
+            time.sleep(random.random())
+            m.acquire()
+            if cls.__instance == None:
+                cls.__instance = object.__new__(cls)
+                m.release()
+            return cls.__instance
+
+        else:
+            return cls.__instance
+
+    def __init__(self,name):
+        if Person.__init_flag == False:
+            self.name = name
+            Person.__init_flag = True
+
+def test_thread():
+    """打印单例对象的id"""
+    print(id(Person("小明")))
+
+if __name__ == '__main__':
+
+    for i in range(10):
+        Thread(target=test_thread).start()
+
+执行代码 发现，程序 卡主了。。为什么呢？
+如果第二次判断 __instance 的时候，__instance 不是None 呢，就不会释放锁了。。那其他线程也就得不到锁了。
+
+
+五.  最终代码
+from threading import Thread,Lock
+import random
+import time
+
+m = Lock()
+
+class Person(object):
+
+    __instance = None
+    __init_flag = False
+
+    def __new__(cls,name):
+        if cls.__instance == None:
+            time.sleep(random.random())
+            m.acquire()
+            if cls.__instance == None:
+                cls.__instance = object.__new__(cls)
+            m.release()
+            return cls.__instance
+
+        else:
+            return cls.__instance
+
+    def __init__(self,name):
+        if Person.__init_flag == False:
+            self.name = name
+            Person.__init_flag = True
+
+def test_thread():
+    """打印单例对象的id"""
+    print(id(Person("小明")))
+
+if __name__ == '__main__':
+
+    for i in range(10):
+        Thread(target=test_thread).start()

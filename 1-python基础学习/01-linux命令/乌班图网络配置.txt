@@ -1,0 +1,40 @@
+一：乌班图的网络配置
+    1.乌班图网络配置文件
+        文件位置：/etc/network/interfaces
+        打开文件文件后，添加：
+            如果手动设置ip：       
+                auto ens33
+                iface ens33 inet static
+                address xx.xx.xx.xx
+                netmask xx.xx.xx.xx
+                gateway xx.xx.xx.xx
+            如果想动态获取ip：
+                auto ens33
+                iface ens33 inet dhcp
+
+    2.添加dns服务器
+        打开/etc/resolv.conf文件，修改：
+        nameserver xx.xx.xx.xx
+        重启乌班图后就失效了
+        解决：
+        打开 /etc/resolvconf/resolv.conf.d/base
+            添加：nameserver xx.xx.xx.xx
+            更新dns：resolvconf -u
+
+        查看dns：
+            cat /etc/resolv.conf
+
+    3.重启网络
+        sudo systemctl restart network-manager.service
+        sudo ifconfig ens33 up
+
+    4.查看网络参数
+        ifconfig
+        nmcli dev show
+
+        注意：修改了/etc/network/interfaces 这个文件后，用ifconfig查看
+              的网络参数是不准确的。
+
+        解决办法：ip addr flush dev ens33  清除配置信息
+                  ifdown ens33
+                  ifup ens33

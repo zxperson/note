@@ -1,0 +1,57 @@
+1. 先行断言
+
+    格式：字符串(?=正则)
+    作用：限定 字符串右侧 字符必须 正则匹配成功
+
+    In [4]: re.search(r'abc(?=123)','abc123')
+    Out[4]: <_sre.SRE_Match object; span=(0, 3), match='abc'>
+
+    匹配说明：
+    正则游标和断言游标 同时移动，到匹配到 c 上面时，开始断言，正则游标 停止，断言游标 开始 断言匹配，匹配成功。
+    如果断言游标匹配成功，正则游标回到开头，重新开始匹配正则。
+
+    问题：
+        In [19]: re.search(r'(?=123)abc','123abc') == None
+        Out[19]: True
+
+    为啥匹配失败了呢？
+    先行断言的格式, 字符串在左侧！如果左侧没字符，相当于: 空字符(?=正则)
+
+
+
+    In [61]: re.search(r'hh(?=123)123aaa','hh123aaa')
+    Out[61]: <_sre.SRE_Match object; span=(0, 7), match='hh123aaa'>
+
+    In [66]: re.search(r'(?=123)123aaa','123aaa')
+    Out[66]: <_sre.SRE_Match object; span=(0, 6), match='123aaa'>
+
+
+    In [72]: re.search(r'(?=123)abc','123abc456') == None
+    Out[72]: True
+
+
+    In [76]: re.search(r'(?=.*\d).{2,6}','1aga')
+    Out[76]: <_sre.SRE_Match object; span=(0, 4), match='1aga'>
+
+
+2. 反向先行断言
+
+    格式：字符串(?!正则)
+    作用：限定 字符串右侧 字符必须 正则匹配失败
+
+    re.search(r'abc(?!123)','abc456')  # 匹配成功，abc后面跟着的不是123
+
+
+3. 后行断言
+
+    格式：(?<=正则)字符串
+    作用：限定 字符串左侧 字符必须 正则匹配成功
+    re.search(r'(?<=\d)abc','6abc') # 匹配成功 abc前面是数字
+
+
+4. 反向后行断言
+
+    格式：(?<!正则)字符串
+    作用：限定 字符串左侧 字符必须 正则匹配失败
+
+    re.search(r'(?<!\d)abc','_abc')  # 匹配成功，abc前不是数字

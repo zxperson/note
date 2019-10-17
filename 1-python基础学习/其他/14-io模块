@@ -1,0 +1,67 @@
+注意：我们使用的open()函数 实际上调用的是 io.open()
+
+1. 内存中读取写入str类型数据，不需要保存到本地
+
+代码：
+import io
+
+output = io.StringIO()    # 创建一个文本流对象，这个对象的方法请参考官方文档。
+output.write("First line.\n")
+print("Second line",file=output)  # file参数的作用：把数据输出到 指定的文本流中。
+
+contens = output.getvalue()  # 获取 文本流 中的数据
+print(contens)
+output.close()   # 把 缓冲区中的 文本流 删除
+
+
+打印结果：
+First line.
+Second line
+
+2. 内存中读取写入bytes类型数据，不需要保存到本地
+
+代码：
+import io
+
+b = io.BytesIO()   # 创建一个 二进制流对象，这个对象的方法请参考官方文档。
+b.write(b"abcdef")
+view = b.getbuffer()   # 返回一个可读可写的视图，通过这个视图可以修改 缓冲区数据，注意，如果这个视图 存在，你就不能调用b.close(). 用del 删除 view变量就可以了
+view[2:4] = b"12"      # 修改缓冲区数据
+print(b.getvalue())    # 获取缓冲区数据
+
+打印结果：
+b'ab12ef'
+
+
+一。 io模块介绍
+
+这个模块提供了 处理各种输入和输出的工具。
+
+三种类型的输入和输出：text I/O    binary I/O   raw I/O. 
+属于这些类别的具体的对象，称之为 file object(文件对象)。有时候也会称之为 stream(流)。也会被称为file-like object(类文件对象)。
+三种文件对象： text files（文本文件对象）
+			  buffered binary files （二进制文件对象）
+			  raw binary files （原始二进制文件对象）（无缓冲的二进制文件对象）
+这些流对象支持：只读、只写、读写。它还可以允许任意的随机存取（向前或向后查找任何位置），或者只允许顺序访问（例如，在套接字或管道的情况下）。
+在向流中写入数据的时候要注意数据类型。类型不匹配会抛出 TypeError 异常。
+
+二。 Text I/O  -- 文本流
+
+创建文本流的最简单方法是使用open函数，并且指定以文本方式打开。
+如果直接在内存中操作可以使用io.StringIO
+
+关于文本流对象的详细使用，请参考： io模块的 TextIOBase 类
+
+三。 Binary I/O  -- 二进制流
+
+创建二进制流的最简单方法是使用open函数，并且指定以二进制方式打开。
+如果直接在内存中操作可以使用io.BytesIO
+
+关于二进制流对象的详细使用，请参考： io模块的 BufferedIOBase 类
+
+四。 Raw I/O   -- 原始流
+
+创建一个原始流的方法：用二进制方式打开，buffering设置为0.
+f = open("myfile.jpg", "rb", buffering=0)
+
+关于原始流对象的详细使用，请参考： io模块的 RawIOBase 类

@@ -1,0 +1,30 @@
+1. json.dumps方法可以将Python对象转换为一个表示JONS数据的字符串
+
+    1.1  默认中文显示成 unicode编码
+        In [3]: json.dumps({'a': 123, 'b': '中国'})
+        Out[3]: '{"a": 123, "b": "\\u4e2d\\u56fd"}'
+
+    1.2  中文，原文显示
+        In [4]: json.dumps({'a': 123, 'b': '中国'}, ensure_ascii=False)
+        Out[4]: '{"a": 123, "b": "中国"}'
+
+    1.3  如果 数据特别复杂，不容易观看，使用两个空格 格式化数据。
+        In [5]: json.dumps({'a': 123, 'b': '中国'},ensure_ascii=False, indent=2)
+        Out[5]: '{\n  "a": 123,\n  "b": "中国"\n}'
+
+2. json.loads方法可以将包含了一个JSON数据的str, bytes或者bytearray对象, 转化为一个Python字典。
+   
+    >>> json.loads('{"a": 123}')
+    {'a': 123}
+
+3.
+# 假设 temp.txt 存储的是 json格式数据。
+# json.load 实现类文件对象中的json字符串转化为python字典
+with open("temp.txt","r") as f:
+    my_dict = json.load(f)
+
+
+4.
+#json.dump 实现把python字典 写入类文件对象（也就是说直接把 字典 保存到 文件中）
+with open("temp.txt","w") as f:
+    json.dump(mydict,f,ensure_ascii=False,indent=2)

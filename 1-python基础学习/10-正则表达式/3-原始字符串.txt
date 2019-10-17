@@ -1,0 +1,54 @@
+1. 在理解原始字符串之前，先要理解 \b 这个退格键的用法。
+	
+	\b 实际上对应的是我们键盘上的backspace键。
+
+	功能不用说大家都知道，删除字符。
+
+	比如： "abc\b123"
+	"\b" 的位置实际就是光标的位置。退格键实际执行的不是删除操作，而是替换操作。这个例子中，我们写了一个 "\b", 
+	光标往回移动到字符"b"的后面，然后把"c" 替换成 "123"。最后字符串打印出来实际上是："ab123".就好像是"c"被删除了。
+
+
+2. 原始字符串
+
+	在正则表达式中 "\b" 代表：匹配一个单词的边界。
+	在普通的字符串中 "\b" 代表：退格键。
+
+	案例1：
+		In [12]: re.search("\bhello", "123 hello 123").group()
+		---------------------------------------------------------------------------
+		AttributeError                            Traceback (most recent call last)
+		<ipython-input-12-cb53eb2156c2> in <module>()
+		----> 1 re.search("\bhello", "123 hello 123").group()
+
+		AttributeError: 'NoneType' object has no attribute 'group'  
+
+		# 在这个例子中为啥会出错了？首先第一个参数，本质上是一个 普通字符串。。。。。。
+
+	正确的写法应该是：
+		In [13]: re.search("\\bhello", "123 hello 123").group()
+		Out[13]: 'hello' 
+
+		In [94]: re.search(r"\bhello", "123 hello 123").group()
+		Out[94]: 'hello'
+
+		# 在普通字符串中 反斜线本身有特殊作用：转义。 我们要把 普通的字符串中的反斜线转义给取消。
+
+	
+	案例2： 匹配 特殊字符:换行符
+		In [79]: re.search("\n","hello\n").group()
+		Out[79]: '\n'
+
+		In [80]: re.search(r"\n","hello\n").group()  
+		Out[80]: '\n'
+
+		# \n 字符 和正则规则 不冲突，所以，上面两种写法都是可以的，不需要转义。
+
+		In [84]: re.search("\\\\n","hello\\n").group()
+		Out[84]: '\\n'
+
+		In [82]: re.search(r"\\n","hello\\n").group()
+		Out[82]: '\\n'
+
+
+	# 注意：原始字符串 结尾不能是 \ 这个字符

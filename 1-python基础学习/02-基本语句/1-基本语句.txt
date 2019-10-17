@@ -1,0 +1,288 @@
+1.  python代码的执行方式
+    
+    # 代码写在哪里，写完了怎么执行？
+
+    第一种：Python交互解释器---ipython
+
+            Python解释器：解释执行Python代码的一个程序。(使用最广泛的是CPython)
+            ipython: 在CPython的基础上，增强了交互方式。
+
+            需要安装 pip install ipython3   （Python3版本）
+                     pip install ipython    （Python2版本）
+
+            一般用来测试代码，不能长久保存代码
+
+    第二种：路径 + 文件名
+            打开一个文件：vi test.py
+            在文件中 输入： 
+                #!/usr/bin/python3.5
+                print('hello,world')
+
+            在命令行中：./test.py  
+
+            注意：需要提前给 test.py 添加执行权限(chmod a+x test.py)
+
+            这种方法，需要 手动指定python解释器和添加执行权限
+
+            如果 文件 不在当前目录，需要写 绝对路径+文件名 这种方式访问
+
+    第三种：python3 + 文件名
+            以 test.py 为例，在命令行里输入：python3 test.py 
+
+            这种方式 不需要手动指定python解释器
+
+2. 语法注意点
+        1) 注释
+            虽然python的可读性非常好，但是并不意味着我们在代码中就可以不写注释。
+            单行注释#
+            多行注释''' '''
+
+        2) \
+            python的语句，一般是 每行一个语句，如果一行当中语句太长了，可以使用 反斜线，然后下一行继续写。
+            注意：
+                有种例外的情况：在使用闭合操作符的时候，可以不用加反斜线。比如:小括号、中括号、大括号
+
+            代码1：
+                a = 100
+                b = 200
+
+                if a == 100 \
+                        and b == 200:
+                    print('--test---')
+
+            代码2：
+                a = [
+                        1,
+                        2,
+                        3,
+                        4
+
+                    ]
+
+                print(a)
+                              
+
+        3) 缩进和代码块
+            python中使用空白字符来分隔代码块。缩进相同的一组语句就是一个代码块，同一个代码组的代码必须严格
+            左对齐。
+
+            关于缩进，建议4个空白字符或者tab。如果是跨平台使用，建议不要使用tab键。
+            因为代码文件可能会在不同的环境、用不同的编辑器打开，而对于space的处理几乎所有的编辑器、
+            所有的OS环境都是一样的，而对于tab的处理却不尽相同，有的会直接展开成空格，有的不会，
+            而且展开为空格的话，有的是4个有的是8个，这样会造成代码的格式看起来不一致。
+            对于python来说这个问题更加重要，因为缩进对于python来说是语法的一部分，
+            所以将tab弄成space会减少很多麻烦。
+
+            代码：
+                a = 100
+
+                if a == 100:
+                    print('--1---')
+                    print('--2---')
+                    print('--3---')
+
+                else:
+                    print('--4--')
+                    print('--5--')
+                    print('--6--')
+
+
+        4) 同一行写多个语句
+            python支持同一行写多个语句。只需要用;分隔就行。python虽然允许这样做，但是不建议这样做。
+            因为这样做会大大降低代码的可读性。
+
+            代码：
+                a = 100;b= 200;print(a);print(b)
+
+3. python2中文
+    默认 Python2用的是ASCII码
+
+    #!/usr/bin/python2.7
+    #coding=utf-8     或者 # -*- coding:utf-8 -*-  注意顺序
+
+4. 变量和数据类型
+    变量：
+        Python 中的变量不需要声明类型，在使用之前需要先赋值。
+
+    类型：
+        变量的类型是动态可变的，我们所说的"类型"是变量所指的内存中对象的类型。
+        可以使用type(变量的名字)，来查看变量的类型
+
+5. 标示符和关键字
+    标示符：
+          标示符是开发人员在程序中自定义的一些符号和名称,如变量名、函数名等 
+
+          只能由字母、数字、下划线 组成。不能以数字开头
+
+    关键字：
+          python 语言自身已经使用的了，一些具有特殊功能的标示符，这就是所谓的关键字。
+
+          我们自己定义标示符的时候，注意不要和关键字重名
+
+6. 输入和输出
+
+    输入：input 和 raw_input
+ 
+        这两个都是Python2的内置函数，都可以读取控制台的输入与用户实现交互。但是这两者的功能不同。
+        Python2 的 raw_input():
+            raw_input() 将所有的输入作为字符串看待，返回字符串类型。
+
+        Python2 的 input()：
+            它希望能够读取一个合法的 python 表达式。
+            而 input() 在对待纯数字输入时具有自己的特性，它返回所输入的数字的类型（ int, float ）
+
+            官方解释：
+                input([prompt])
+                Equivalent to eval(raw_input(prompt)).
+
+                eval(str)函数很强大，官方解释为：将字符串str当成有效的表达式来求值并返回计算结果。
+
+        python2的 raw_input 和 Python3 的 input 等效,都会把输入的数据转换成str类型
+
+    输出：
+        Python2的 print 是一个语句
+        python3的 print 是一个函数
+
+        python3中print函数有2个重要参数，sep和end。
+                sep：间隔符。同时打印多个值的时候，每个值以什么字符分隔。默认是空格。
+                end：结束符。打印结束，以什么字符结尾。默认是'\n'。
+
+7. 算数运算符
+    + - * / // % **
+
+8. 复合赋值运算符
+    += -= *= /= %= **= //=
+
+9. 比较运算符
+    == !== > < >= <=
+
+10. 逻辑运算符
+    and or not  '和' '或者' '取反'
+
+11. if语句
+
+    if-else 的格式：
+        if 条件：
+            条件为'真'时要做的事情1
+            条件为'真'时要做的事情2
+            ...
+        else：
+            条件为'假'时要做的事情1
+            条件为'假'时要做的事情2
+            ...
+    条件为'假': False None 0 '' [] () {}
+    条件为'真'：True  非0的数字 非空的字符串、列表、元组、字典
+
+    True和False 都属于 bool类型，bool类型只有这两个值。 一切皆对象。
+    None属于 NoneType类型，NoneType类型唯一的值是None
+
+    Python中，每一个对象都有一个bool类型的值，如何查看某个对象的bool值呢？
+    例如：None.__bool__()
+
+    elif 的格式：
+        if 条件1:
+            条件1为'真'时要做的事情
+            ...
+        elif 条件2：
+            条件2为'真'时要做的事情
+
+        elif 条件3：
+            条件3为'真'时要做的事情
+        else：
+            所有条件都是'假'时要做的事情
+
+12. while语句
+
+    while 条件：
+        条件为'真'时要做的事情
+        ...
+
+13. for 语句
+    
+    for 遍历 对象的时候，不要修改这个对象
+    
+    格式：
+        for 临时变量 in 可迭代对象:
+            循环满足条件时执行的代码
+        else:
+            循环不满足条件时执行的代码
+
+        当可迭代对象迭代完并为空时，位于else的子句将执行。
+        而如果在for循环中执行了break时则直接终止循环，并不会执行else子句。
+		
+14. 逻辑运算符：
+
+    and:  x and y  如果 x 为 False，表达式返回 False。如果 x 为 True，表达式返回 y 的值。
+
+    or:   x or y   如果 x 是非0（True），表达式返回 x 的值。否则 返回 y值。
+
+    not:  not x    如果 x 是 True， 表达式返回 False。
+
+
+    demo_1：
+    In [1]: a = 100
+
+    In [2]: b = 200
+
+    In [3]: c = a==b and 300 
+
+    In [4]: c
+    Out[4]: False
+
+    demo_2:
+    In [1]: a = 100
+
+    In [2]: b = 200
+
+    In [3]: c = a==b and 300 or "haha"
+
+    In [4]: c
+    Out[4]: 'haha'
+
+15. 三元表达式 
+
+In [114]: a = 100
+
+In [115]: b = 200 if a == 300 else "haha"  # 如果 if 表达式成立，返回200，否则 返回"haha"  
+
+In [116]: b
+Out[116]: 'haha'
+
+
+16. # [16年JD笔试题] 有一个 15 层楼梯，有个人上楼梯最多可以一次迈上 3 层梯子
+    # 这个人要把 15 层的楼梯走完，一共有多少种走法。
+    
+    #f(n) = f(n-1)+f(n-2)+f(n-3)  
+
+    # coding:utf-8
+    s_number = int(input('请输入总台阶数量:'))
+    s_list = [1, 2, 4]
+
+    if s_number < 4:
+        print(s_list[s_number-1])
+
+    elif s_number > 3:
+        while s_number-3:
+            s_list.append(s_list[-1] + s_list[-2] + s_list[-3])
+            s_number -= 1
+
+        print(s_list[-1])
+		
+    s_number = int(input('请输入台阶数:'))
+
+	
+# 递归解决
+    def func(number):
+        li = [1,2,4]
+        if number < 4:
+            return li[number-1]
+        else:
+            if number > 3:
+                return func(number-1)+func(number-2)+func(number-3)
+
+    print(func(15))
+
+
+
+
+

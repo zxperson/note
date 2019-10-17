@@ -1,0 +1,225 @@
+
+1.迭代器
+    1.1 如何自己定义一个迭代器？
+
+        1). 可迭代对象(Iterable)
+        可以直接作用于for循环的对象，称之为可迭代对象。
+            代码：
+                from collections import Iterable,Iterator
+
+                class test(object):
+
+                    def __iter__(self):
+                        return iter([1,2,3])
+
+                it = test()
+                print(isinstance(it,Iterable))
+                print(list(iter(it)))     #  iter(it), 调用it这个对象的 __iter__ 方法
+
+        可迭代对象，一定实现了__iter__方法。isinstance內建函数，可以判断一个对象是否是某个类的实例对象。通过运行代码我们可以看到，返回了True.
+
+        __iter__ 这个方法只有返回一个特殊的对象才有实际的意义。(这个特殊对象，可以调用__next__方法，不断返回一个值，没有值的时候抛出StopIteration异常)
+
+        2). 接下来，迭代器(Iterator)
+        可以调用__next__方法，不断返回一个值的对象称之为迭代器.
+        迭代器要求必须有__iter__方法和__next__方法。换句话说，也就是，如果你想自己定义一个迭代器，那么你必须定义__iter__方法和__next__方法。
+            代码：
+                    from collections import Iterable,Iterator
+
+                    class test(object):
+                        def __init__(self, b):
+                            self.a = 0
+                            self.b = b
+
+                        def __iter__(self):
+                            return self
+
+                        def __next__(self):
+                            if self.a < self.b:
+                                i = self.a
+                                self.a += 1
+                                return i
+                            else:
+                                raise StopIteration()
+
+                    it = test(10)
+                    print(isinstance(it,Iterable))
+                    print(isinstance(it,Iterator))
+
+                    # next(it)  # 实际上 调用 it 对象的 __next__ 方法。
+
+                    for temp1 in it:
+                    print(temp1)
+
+                    for temp2 in it:
+                    print(temp2)
+
+            列表、元组、字符串、字典、集合 这些虽然是 可迭代对象，但是不是 迭代器。iter() 函数可以很方便的把他们转换为迭代器。
+            在ipython3里测试下。li = [1,2,3]  dir(li) iter(li)  isinstance(li,Iterable)
+
+            for循环的工作原理：调用iter()函数，获取一个迭代器对象，然后迭代器调用__next__()方法不断返回一个值，直到遇到StopIteration这个异常。
+            注意：迭代器 在 返回所有值之后，就空了，没有了。it这个对象，就好比是一个盛满水的水壶，调用__next__方法相当于 倒水，水倒完了，水壶自然就空了
+                  那么，如何重复利用it这个对象呢？
+
+            代码：
+                class kettle(object):
+                    def __init__(self, b):
+                        self.b = b
+
+                    def __iter__(self):
+                        return water(self.b)
+
+                class water(object):
+                    def __init__(self, b):
+                        self.a = 0
+                        self.b = b
+
+                    def __next__(self):
+                        if self.a < self.b:
+                            i = self.a
+                            self.a += 1
+                            return i
+                        else:
+                            raise StopIteration()
+
+                it = kettle(10)
+
+                for temp1 in it:
+                    print(temp1)
+
+                print('--------分割线---------')
+
+                for temp2 in it:
+                    print(temp2)
+
+            分析：在这段代码里，it对象在创建出来的时候，相当于 创建了一个水壶，但是水壶里没有水，it对象，调用__iter__函数，才是往水壶 装水。
+                  这两段代码的区别是：前一段代码里，it对象在创建之后，就装满水了，水和水壶是不分家的，创建水壶的同时，水也创建了。
+
+                  后一段代码里。只有调用了__iter__函数，才会往水壶装水。
+
+2.生成器(generator)
+
+        生成器一定是 迭代器。迭代器不一定是生成器。
+        生成器 是 一种 快速创建 迭代器的 方式。
+
+        1). 快速创建一个生成器
+            In [9]: test = (x*x for x in range(10))   #复习下range，range的返回值是一个可迭代对象，可以用iter()函数，返回一个迭代器。
+
+            In [10]: type(test)
+            Out[10]: generator
+
+            In [22]：test.__next__()   #执行完，看抛出的异常。
+
+        可以看到，生成器，就是一个迭代器。
+
+        2). 第二种定义方式--函数：
+            代码：
+                def list_generator(li):
+                    for i in li:
+                        yield i
+
+                g = list_generator([1,2,3,4,5])
+
+                print(g.__next__())
+                print(g.__next__())
+                print(g.__next__())
+                print(g.__next__())
+                print(g.__next__())
+                print(g.__next__())
+
+        3). 第三种定义方式--类：
+            代码：
+                class ListGenerator(object):
+
+                    def gen(self,li):
+                        for i in li:
+                            yield i
+
+                t = ListGenerator()
+                g = t.gen([1,2,3,4])
+
+                for temp in g:
+                print(temp)
+
+        4) send
+            代码：
+                def list_generator(li):
+                    for i in li:
+                        re = yield i
+                        if re:
+                            print("revc is {}.".format(re))
+                        else:
+                            print("recv is nothing")
+
+                g = list_generator([1,2,3,4,5])
+
+                print(g.send(None))   #先不要写print
+                print(g.send('haha'))
+
+        5).throw  用来向 生成器中 传入异常
+            在生成器暂停的位置引发一个异常，并返回由生成器函数生成的下一个值。
+            如果生成器退出而不产生另一个值，则引发StopIteration异常。
+            如果生成器函数没有捕获传入的异常，或者引发不同的异常，那么该异常将传播给调用者。
+
+            代码：
+                def list_generator(li):
+                    for i in li:
+                        try:
+                            re = yield i
+                            if re:
+                                print("revc is {}.".format(re))
+                            else:
+                                print("recv is nothing")
+
+                        except ValueError:
+                            print("receive a ValueError")
+
+                g = list_generator([1,2,3,4,5])
+
+                print(g.__next__())
+                t = g.throw(ValueError)
+                print(t)
+
+        6).close  用来关闭生成器
+            在 生成器暂停的位置引发GeneratorExit异常。
+            如果没有捕获异常，则 生成器会正常退出。
+
+            如果我们手动捕获了GeneratorExit 异常，生成器会 继续执行，而不会关闭，下次再遇到 yield 语句的时候，会抛出RuntimeError异常。
+
+            代码1：
+                def list_generator():
+                    print('------start--------')
+                    yield 1
+                    print('------1-----')
+                    yield 2
+                    print('------2-----')
+
+                g = list_generator()
+
+                print(g.__next__())
+                g.close()
+
+            代码2：
+                def list_generator():
+                    print('------start--------')
+                    try:
+                        yield 1
+                        print('------1-----')
+                    except GeneratorExit:
+                        print('----generator-exit-----')
+                        print('------3------')
+                    #yield 2
+                    #print('------2-----')
+
+                    g = list_generator()
+
+                    print(g.__next__())
+                    g.close()
+
+
+
+
+
+
+
+

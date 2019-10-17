@@ -1,0 +1,309 @@
+请注意，相对导入基于当前模块的名称。 
+由于启动模块的__name__始终为“__main__”，因此用作Python应用程序主模块的模块必须始终使用绝对导入。
+
+1. sys.modules
+Python中所有加载到内存的模块都放在sys.modules这个字典中。
+
+当import一个模块时首先会在这个字典中查找是否已经加载了此模块，
+如果加载了则只是将模块的名字加入到正在调用import的模块的Local名字空间中。
+如果没有加载则从sys.path目录中按照模块名称查找模块文件，
+找到后将模块载入内存，并加入到sys.modules中，并将名称导入到当前的Local名字空间。
+
+注意：模块的加载和是否可见是两个不同的概念。
+    例如：os模块在Python解释器启动的时候，已经被加载到了sys.modules字典里了，那为啥还需要导入才能正常使用呢？
+         虽然这些模块已经被提前加载到了内存，但是 并不是可见的。需要导入到当前的作用域里才行。
+
+2. sys.path
+    python模块和包的 搜索路径。
+
+
+3.python导入系统：
+
+除了使用 import 关键字之外，还可以使用 importlib.import_module() 和 __import__() 来进行导入。
+
+sys = __import__("sys")，导入sys模块，注意要用一个变量接收返回值。__import__ 的返回值，就是对应的模块对象。
+
+Python中所有的模块对象 都是 module 类型。为了更好的组织这些模块的层次结构，Python中有了 包 这个概念。
+我们可以把 包 类比为 目录，把模块类比为 目录下的py文件。虽然可以这样类比，但是大家不要执着于这句话的字面意思。
+
+这是非常重要的：
+所有的包都是模块。但是并非所有的模块都是包。换句话说，包 仅仅是 一种特殊模块。
+具体来说，任何包含__path__属性的模块都被视为包。
+__path__指的是包的绝对路径：例如：
+    In [2]: gevent.__path__
+    Out[2]: ['/home/whit/.local/lib/python3.6/site-packages/gevent']
+
+3.1 Python包的分类：
+    Python中的包分成两种：普通包(包含__init__.py)和命令空间包。
+    我们这里仅仅讨论普通包。
+    关于命令空间包，请参考：https://blog.csdn.net/lis_12/article/details/81279332
+
+    普通包的特点：
+    parent/
+        __init__.py
+        one/
+            __init__.py
+        two/
+            __init__.py
+        three/
+            __init__.py
+
+    当我们导入 parent.one 的时候，会隐式的执行 parent/__init__.py 和 parent/one/__init__.py
+
+
+    为了开始搜索，Python 需要被导入模块（或者包，对于当前讨论来说两者没有差别）的完整 限定名称。
+    此名称可以来自 import 语句所带的各种参数，或者来自传给 importlib.import_module() 或 __import__() 函数的形参。
+    此名称会在导入搜索的各个阶段被使用，它也可以是指向一个子模块的带点号路径，例如 foo.bar.baz。
+    在这种情况下，Python 会先尝试导入 foo，然后是 foo.bar，最后是 foo.bar.baz。如果这些导入中的任何一个失败，都会引发 ModuleNotFoundError异常。
+
+
+3.2 python导入机制
+
+    如果在sys.modules中找不到指定的模块，则调用Python的导入协议来查找和加载模块。
+    Python的导入协议中包含两个对象：finder 对象和 loader对象。
+        finder对象(查找器)：
+            尝试为 正在被导入的模块 找loader对象。
+
+            从Python3.3开始，有两种finder对象：
+                meta path finder（继承于importlib.abc.MetaPathFinder）配合 sys.meta_path 使用
+                path entry finder（继承于importlib.abc.PathEntryFinder） 配合 sys.path_hooks 使用
+
+                详情查看：https://www.python.org/dev/peps/pep-0302/
+                         https://www.python.org/dev/peps/pep-0420/
+                         https://www.python.org/dev/peps/pep-0451/
+        
+        loader对象(加载器)：
+            用于加载模块。这个对象必须定义 load_module()方法。这个对象通常是由finder对象返回。
+            详情查看：https://docs.python.org/3/library/importlib.html#importlib.abc.Loader
+
+    如果 实现了 finder对象的方法之后，又实现了 loader对象的方法，这样的对象称之为 importer 对象(导入器)。
+    
+
+    finder实际上并没有加载模块。 如果他们能找到指定的模块,就会返回一个 module spec。
+    module spec 是一个命名空间，是 importlib.machinery.ModuleSpec 类的对象;
+    module spec 这是对模块导入相关信息的封装，供后续导入机制用于在加载模块时使用;
+    module spec 对象包含了 loader属性，这个属性保存的是 loader对象;
+
+    导入机制是可扩展的，因此可以添加新的查找器以扩展模块搜索的范围
+    Python的导入机制是可以扩展的。有两种导入钩子：meta hook(元钩子) 和 import path hook(导入路径钩子)
+
+    1）meta hook---元钩子
+    
+       如果 sys.modules 没有找到包，那么再进行其他处理之前（例如：从sys.path查找），会触发 meta hook
+       通过向sys.meta_path添加新的finder对象来 注册 元钩子
+
+    2）import path hook---导入路径钩子
+
+       在进行 sys.path (或者package.__path__) 相关的处理的时候，会触发 这钩子。
+       通过向sys.path_hooks添加新的callables（可调用的函数或者方法）来注册 导入路径钩子
+     
+
+     当模块在sys.modules找不到的时候，接下来会去sys.meta_path搜索。
+     sys.meta_path 是一个列表，里面包含了许多 meta path finder对象(元路径查找器)；
+     这些 元路径查找器 必须实现find_spec()方法。
+
+     如果 元路径查找器 知道如何处理模块，它返回spec对象，如果不知道就返回None
+     如果sys.meta_path中的 元路径查找器 没有一个返回spec对象，则抛出ModuleNotFoundError异常
+
+     find_spec(fullname, path, target=None)
+     第一个参数是要导入的模块的完全限定名称，例如foo.bar.baz
+     第二个参数是用于模块搜索的路径条目，对于顶级包，第二个参数为None。但对于模块或子包，第二个参数是父包的__path__属性的值
+        如果相应的 __path__ 属性无法访问，将引发 ModuleNotFoundError异常
+     第三个参数是一个现有的模块对象，它将成为稍后加载的目标。 导入系统仅在重新加载期间传入目标模块
+
+     当我们导入foo.bar.baz时候，假设所涉及的模块都尚未被缓存。
+     将首先执行顶级的导入，在每个元路径查找器 (mpf) 上调用 mpf.find_spec("foo", None, None)。
+     在导入 foo 之后，foo.bar 将通过第二次遍历元路径来导入，调用 mpf.find_spec("foo.bar", foo.__path__, None)。
+     一旦 foo.bar 完成导入，最后一次遍历将调用 mpf.find_spec("foo.bar.baz", foo.bar.__path__, None)
+
+     sys.meta_path 中 默认有3个 元路径查找器。一个知道如何查找内建模块，一个知道如何查找冻结的模块，
+     最后一个知道如何从 import path 路径里导入模块。import path 通常指的是sys.path 里的路径，但对于子包，它也可能来自父包的__path__属性
+
+     注意：从python3.4开始，find_spec 替换了 find_module方法。只有find_spec 方法没有定义的时候，才会调用find_module方法。
+           find_module方法已经被弃用了，所以不推荐使用了。
+
+
+    许多情况下 finder和loader 是同一个对象，这样的对象 也就是 importer对象。
+
+
+    模块加载细节：
+        如果找到spec对象，导入机制将在加载模块时使用它（以及它包含的加载器）
+        loader对象(加载器)包含如下三个方法：
+            create_module(spec) ：创建模块对象，然后返回。如果方法返回None，则导入机制将自己创建新模块。
+            exec_module(module) ：在导入或重新加载模块时，在其自己的命名空间中执行模块。Python3.6版本之后，必须先要定义create_module方法
+                                这个方法不需要返回值。
+            Python3.6中：如果定义了 exec_module 没有定义 create_module 会抛出ImportError异常。
+
+            load_module(fullname)：（从Python3.4版本已经弃用，这里作为了解就行）（被exec_module替换 ）
+                用于加载模块，如果不能加载模块，会抛出ImportError异常。如果正常加载，返回模块对象。
+
+                如果请求的模块已存在于sys.modules中，则应使用并重新加载该模块。 
+                否则，loader应该在任何加载开始之前创建一个新模块并将其插入到sys.modules中，
+                如果 loader插入了一个模块并且加载失败，那么它必须由loader从sys.modules中删除
+                在加载程序开始执行之前已经存在于sys.modules中的模块应该保持不变
+
+                loader对象 应该在 模块对象上设置几个魔法属性（请注意，重新加载模块时，其中一些属性可能会更改）。
+
+        用于加载模块的推荐API是exec_module和create_module。 
+        loader对象应该实现它们而不是load_module。
+
+        模块加载说明：
+            module = None
+            if spec.loader is not None and hasattr(spec.loader, 'create_module'):
+                # It is assumed 'exec_module' will also be defined on the loader.
+                module = spec.loader.create_module(spec)
+            if module is None:
+                module = ModuleType(spec.name)
+            # The import-related module attributes get set here:
+            _init_module_attrs(spec, module)
+
+            if spec.loader is None:
+                if spec.submodule_search_locations is not None:
+                    # namespace package
+                    sys.modules[spec.name] = module
+                else:
+                    # unsupported
+                    raise ImportError
+            elif not hasattr(spec.loader, 'exec_module'):
+                module = spec.loader.load_module(spec.name)
+                # Set __loader__ and __package__ if missing.
+            else:
+                sys.modules[spec.name] = module
+                try:
+                    spec.loader.exec_module(module)
+                except BaseException:
+                    try:
+                        del sys.modules[spec.name]
+                    except KeyError:
+                        pass
+                    raise
+            return sys.modules[spec.name]
+
+        1）如果 spec.loader 不是None 以及loader对象定义了create_module方法，
+           那么就去 调用spec.loader.create_module(spec)，创建模块对象。
+
+        2）如果上一步中没有成功创建出来模块对象，那么就调用types.ModuleType(spec.name) 来创建对象，
+            然后给 模块对象 初始化各种魔法属性。__file__ 、__path__ 等等等。
+        
+        3）如果 spec.loader 是None，直接抛出 ImportError异常（这里仅仅讨论普通包）。
+
+        4）如果 没有定义 exec_module 方法，则 Python会调用已经被废弃的load_module方法，加载模块。
+           这里推荐 一定要 定义 exec_module方法。
+
+        5）如果spec.loader 不是None，定义了create_module和exec_module, 模块对象已经创建好了，
+           把 模块对象保存到 sys.modules ,然后执行 exec_module 加载模块。
+
+
+        注意事项：
+
+        1）如果sys.modules中存在具有给定名称的现有模块对象，则import将返回它。
+
+        2）在 loader对象执行 exec_module 方法之前，必须要把 模块对象 保存到sys.modules
+
+        3) 如果 模块创建成功，但是加载模块失败了，必须 把 这个模块从 sys.modules 中删除。
+
+        4）创建模块后但在执行之前，导入机制会设置与导入相关的模块属性（__name__、__file__、__cached__、__path__、__package__、__loader__、__spec__）
+            __spec__: 必须设置为导入模块时使用的 module spec 对象。
+            当 __package__ 没有设置的时候，__spec__.parent 作为后备选项
+
+        5）在加载期间创建并传递给exec_module（）的模块可能不是导入结束时返回的模块（我们就认为是同一个就完事了）
+
+
+    module spec 对象：
+        importlib.machinery.ModuleSpec 类创建出来的对象。
+        这个对象 保存的是 在导入过程中，模块加载之前，导入系统用到的关于模块的各种信息。
+        module.__spec__.origin == module.__file__，注意 这里仅仅是值可能相同，但是并不等同是一个对象。
+        这些属性和模块中的属性是一致的。 这个对象的常见属性包括：
+            1） name 
+                模块的 __name__ 值。
+                例如，import re , 那么re 模块的 __name__ 就是 "re"
+                      import pack.music , 那么 pack.music 模块的 __name__ 就是 'pack.music'
+            
+            2)  loader
+                模块的 __loader__ 值。如果是 命令空间包，这个属性需要设置为None
+
+            3） origin
+                模块的 __file__ 值。
+                模块文件的存放路径。
+                如果是包的时候：import pack , 此时，pack的 __file__ 属性类似：'/home/python/study/pack/__init__.py' ,而不是单纯的文件路径。
+
+            4） submodule_search_locations
+                模块的 __path__ 值。 如果这个模块是包的情况下才需要设置__path__
+                这个值通常是一个列表，里面包含了 包的 搜索路径。例如，import pack , pack 包的 __path__ 属性类似：['/home/python/study/pack']
+
+            5)  parent
+                模块的 __package__ 值。
+
+            6）cached
+                模块的 __cached__ 值。
+
+    module 对象常用属性：
+        在加载程序（loader对象）执行模块代码之前，导入机制在加载期间根据模块的spec对象在每个模块对象上填充这些属性。
+
+        1） __name__
+            模块的名字
+            例如，import re , 那么re 模块的 __name__ 就是 "re"
+            import pack.music , 那么 pack.music 模块的 __name__ 就是 'pack.music'     
+
+        2） __loader__
+            加载模块时候 使用的 loader 对象。
+
+        3） __package__  
+            必须设置模块的__package__属性。
+            当模块是包时，其 __package__ 值应设置为 __name__ 的值。 
+            当模块不是包时，设置成 父包的 名字。
+
+            如果是启动模块，它的值是None
+
+        4） __spec__
+           通常是设置成 相应的moduel spec 对象。特殊情况参考文档：https://docs.python.org/3/reference/import.html#__path__
+
+        5） __path__
+            如果模块是一个包，__path__ 必须设置。
+            可以设置成一个列表，列表中保存 包 的搜索路径。在功能上__path__和sys.path类似。
+            包的__init__.py文件可以设置或更改包的__path__属性。
+
+            非包模块不应具有__path__属性。
+
+            例如：import pack , 那么 pack 的 __path__ 值 类似：['/home/python/study/pack']
+
+        6) __file__ 和 __cached__ 
+            __file__是可选的。 如果设置，则此属性的值必须是字符串。 如果没有语义含义，导入系统可能不会设置 __file__，例如从数据库加载的模块
+
+            如果设置了__file__，也可以设置__cached__属性，这是任何编译版本的代码的路径(pyc文件路径)
+
+            如果未设置__file__，则设置__cached__也是合适的。 但是，这种情况非常不典型。
+            如果loader对象可以从缓存模块加载，但是不从文件加载，则该非典型场景可能是合适的。
+
+    PathFinder 说明：
+        sys.meta_path 中 包含了 3个 内置的 meta path finder, 分别是：
+        [<class '_frozen_importlib.BuiltinImporter'>, <class '_frozen_importlib.FrozenImporter'>, <class '_frozen_importlib_external.PathFinder'>]
+        其中第一个是用来 查找内建函数的，第二个用来查找被冻结的模块；
+        第三个用来 根据sys.path 里的路径进行查找，如果是子包，可能根据的是 父包的__path__属性进行查找。
+
+        PathFinder 比较特殊，它本身不能查找任何模块。
+        相反，它会遍历各个路径条目，将每个条目与一个 path entry finder 相关联，这个 path entry finder 知道如何查找这个特定路径里的模块。
+
+    
+    path entry finder 说明：
+        meta path finder 从搜索列表中遍历每个路径条目，为每个路径条目寻找一个 path entry finder。
+        meta path finder 维护了一个缓存，包含 路径条目--path entry finder 之间的映射。这个缓存保存在 sys.path_importer_cache 中。
+
+        如果路径条目在 缓存中不存在，那么meta path finder 会遍历 sys.path_hooks 中的 每个 path entry finder。
+        如果遍历完成后，没有返回一个合适的 path entry finder ，meta path finder 对象的 find_spec() 方法，会返回None，并且在 sys.path_importer_cache中，对应的路径条目，会保存成None，代表这个条目没有 path entry finder。
+        同时也表明，这个 meta path finder 不能查找这个模块。
+        如果 遍历 sys.path_hooks 后，返回了一个 合适的 path entry finder ，那么会使用 Path entry finder protocol 这个协议去 创建和加载模块。
+
+        sys.path 中的 空字符串，代表当前目录。如果当前目录中没有找到目录，sys.path_importer_cache 中 不会保存 对应的映射。
+
+
+    Path entry finder protocol 说明：
+        path entry finder 必须实现 find_spec(fullname, target=None) 这个方法，继承于 importlib.abc.PathEntryFinder
+
+        Python3.4版本后，find_spec 方法替换了 find_loader() 和 find_module()，如果定义了 find_spec 方法，则会自动忽略 两个旧方法。
+
+
+
+
+        
+

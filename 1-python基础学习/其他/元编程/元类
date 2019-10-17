@@ -1,0 +1,56 @@
+
+一. 通过type创建类。
+
+class Base(object):
+    num = 100
+
+A = type("A",(Base,),{"name":"xx"})  # 第一个参数是类的名字(class关键字后面的名字)，第二个参数是元组，代表继承的父类。
+                                     # 第三个参数是字典，代表，类属性，或者实例方法，类方法，静态方法。
+print(help(A))
+
+
+二、 通过type创建类，并且 添加实例方法。
+
+def get_name(self):
+    print("实例方法")
+
+A = type("A",(),{"get_name":get_name})
+
+a = A()
+a.get_name()
+
+
+三、通过type创建类，并且 添加类方法。
+
+@classmethod
+def get_name(self):
+    print("类方法")
+
+A = type("A",(),{"get_name":get_name})
+
+A.get_name()
+
+实例方法、类方法、静态方法、添加的原理是一样的。
+
+
+四、通过自定义元类来创建类对象。
+
+代码：
+class UpperAttrClass(type):
+    def __new__(cls, class_name, class_parent, class_attr):
+        print("类名字:",class_name)
+        print("父类:",class_parent)
+        print("类属性,实例方法,类方法:",class_attr)
+        new_attr = {}
+        for name, value in class_attr.items():
+            new_attr[name.split("__")[1]] = value
+
+        return type.__new__(cls, class_name, class_parent, new_attr)
+
+class Test(object, metaclass=UpperAttrClass):   # 这种写法，仅仅适用于 python3,创建Test类的时候会调用UpperAttrClass类创建。
+    __name = "xx"
+
+
+t = Test()
+print(t.name)
+

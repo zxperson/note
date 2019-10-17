@@ -1,0 +1,220 @@
+    1.闭包
+        代码：
+            def test(num):
+                print(num)
+                def inner(value):
+                    print(num + value)
+                return inner
+      
+            res = test(20)
+            res(100)
+            print('-------分割-------------')
+            res(200)
+
+            总结：闭包其实就是，函数里面又定义了一个函数，外层的函数返回内层函数的地址。
+
+2. 装饰器：
+    1).首先看最简单的装饰器：
+        代码：
+        def test(func):
+            def inner():
+                print('------haha--------')
+                func()
+            return inner
+
+        def f1():
+            print('--------f1-----------')
+
+        if __name__ == '__main__':
+            f1 = test(f1)
+            f1()
+
+        画个图帮助理解。
+
+        然后，稍微修改下代码：
+        def test(func):
+            def inner():
+                print('------haha--------')
+                func()
+            return inner
+
+        @test   #f1=test(f1)
+        def f1():
+            print('--------f1-----------')
+
+        if __name__ == '__main__':
+            f1()
+
+    2). 被装饰的函数带参数
+        代码：
+            def test(func):
+                def inner(a,b):
+                    print('----接下来计算a+b的和-----')
+                    func(a,b)
+                return inner
+
+            @test  #f1=test(f1)
+            def f1(a,b):
+                print("a+b=%d" % (a+b))
+
+            if __name__ == '__main__':
+                f1(1,2)
+
+    3).通用装饰器
+        代码：
+            def test(func):
+                def inner(*args,**kwargs):
+                    print('----接下来计算a+b的和-----')
+                    func(*args,**kwargs)
+                return inner
+
+            @test  #f1=test(f1)
+            def f1(a,b):
+                print("a+b=%d" % (a+b))
+
+            @test #f2=test(f2)
+            def f2(a,b,c):
+                print("a+b+c=%d" % (a+b+c))
+
+            if __name__ == '__main__':
+                f1(1,2)
+                f2(1,2,3)
+
+    4).2个装饰器
+        代码:
+            def jiacu(func_1):
+                print('----加粗----')
+                def inner_1():
+                    return '--加粗--' + func_1() + '--加粗--'
+                return inner_1
+
+            def xieti(func_2):
+                print('---斜体---')
+                def inner_2():
+                    return '--斜体--' + func_2() + '--斜体--'
+                return inner_2
+
+            @jiacu  #test3 = jiacu(test3)
+            @xieti  # test3 = xieti(test3) = inner_2   #先执行 这个语句，然后才会执行 @jiacu
+            def test3():
+                return 'hello world--3'
+
+            if __name__ == '__main__':
+                re = test3()
+                print(re)
+
+        画图帮助理解。
+
+    5).装饰器 带参数
+        代码：
+            def outside(a):
+                def test(func):
+                    def inner():
+                        print(a)
+                        print('------haha--------')
+                        func()
+                    return inner
+                return test
+
+
+            @outside(100)  @test #函数执行完，返回了test这个装饰器
+            def f1():
+                print('--------f1-----------')
+
+            if __name__ == '__main__':
+                f1()
+
+    6).装饰器 函数 装饰实例方法
+        代码：
+            def prompt(func):
+                def inner(self):
+                    print('----接下来需要打印提示----')
+                    func(self)
+                return inner
+
+            class Person(object):
+                def __init__(self,name):
+                    self.name = name
+                
+                @prompt    #get = prompt(get)
+                def get(self):
+                    print(self.name)
+
+            if __name__ == '__main__':
+                xiaoming = Person('xiaoming')
+                xiaoming.get()
+
+    7.) 类当做装饰器
+        首先要理解 魔法方法 __call__
+            class Person(object):
+                def __call__(self):
+                    print('-------call------')
+
+            t = Person()
+            t()
+        t是 Person类的一个实例对象，如果执行t(),那么python解释器会去 执行__call__方法里面的代码。
+
+
+        那如何把一个类做成装饰器呢？
+
+            class Person(object):
+                def __init__(self, func):
+                    self.__func = func
+
+                def __call__(self, *args, **kwargs):
+                    print('-----装饰器里的代码------')
+                    self.__func()
+
+            @Person  # test = Person(test)
+            def test():
+                print('-----test-------')
+
+            test()
+
+               
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+            
+
+
+
+
+        
+
+
+
+
+    
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+

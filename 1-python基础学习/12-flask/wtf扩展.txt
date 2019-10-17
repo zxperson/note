@@ -1,0 +1,16 @@
+wtf扩展csrf验证过程：
+1.获取请求体中的csrf_token值，如果请求体中没有找到，就会去请求头中找。如果都没有找到，raise ValidationError('The CSRF token is missing.')。
+	注意：请求体或者请求头中的值，是 csrf_token哈希之后，又经过了一次签名的值。
+2.假设请求体或者请求头中的csrf_token值 获取到了，判断session数据中是否有 csrf_token 这个字段，如果没有 raise ValidationError('The CSRF session token is missing.')。
+3.假设 session数据中有 csrf_token 这个字段，使用itsdangerous模块的URLSafeTimedSerializer类的loads方法，根据签名值，解析出来 csrf_token哈希值，然后和session中保存的token值进行对比。
+
+wtf扩展 生成csrf_token值的过程：
+1. 随机生成一个64字节的 bytes类型的字符串
+2. 对这个字符串 进行sha1哈希，然后把这个哈希值存入session数据csrf_token字段中。
+3. 使用itsdangerous模块的URLSafeTimedSerializer类的dumps方法，对session中存入的哈希值生成一个签名，把这个签名保存到g变量中。可以通过秘钥把 签名反解析成 session中的哈希值。
+   客户端cookie中保存的值就是 对哈希值签名之后的字符串。
+   
+   注意：URLSafeTimedSerializer类 进行签名的的时候，内部用到了 时间戳。。。。
+   
+   
+ 

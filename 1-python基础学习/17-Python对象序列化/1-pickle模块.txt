@@ -1,0 +1,96 @@
+1. 什么叫序列化？
+把Python对象转换成字节流，我们称之为序列化。字节流我们可以认为是，bytes类型的数据。
+
+pickle模块中，支持5中序列化协议，版本号分别是:0,1,2,3,4. 在Python3中默认使用协议3，最高支持协议4
+
+
+
+API：
+
+1)1. pickle.dumps(obj, protocol=None, *, fix_imports=True)
+
+将 Python对象 进行序列化，转换成字节流。(序列化)
+
+    参数说明：
+        protocol : 指定 序列化协议。
+        fix_imports: 如果指定的协议版本小于3，并且此参数设置成了True，则会尝试使用Python2中 序列化模块进行序列化。
+
+代码：
+import pickle
+
+li = [1,2,3,4]
+li_str = pickle.dumps(li)
+print(li_str)
+
+with open("temp.txt",'wb') as f:
+    f.write(li_str)
+
+
+2). pickle.loads(bytes_object, *, fix_imports=True, encoding="ASCII", errors="strict")
+
+将 字节流 反序列化，转换成 把Python对象。
+
+    参数说明：
+        encoding和errors告诉pickle如何解码Python2中 pickle的8位字符串实例。
+        encoding可以设置成' bytes '，以读取这些8位字符串实例为bytes对象。
+
+代码：
+import pickle
+
+with open("temp.txt",'rb') as f:
+    li_str = f.read()
+
+li = pickle.loads(li_str)
+print(li)
+
+3). pickle.dump(obj, file, protocol=None, *, fix_imports=True)
+
+    将 Python对象 进行序列化，转换成字节流，然后保存到文件中。
+
+代码:
+import pickle
+
+f = open('temp.txt','wb')
+
+li_1 = [1,2,3,4]
+pickle.dump(li_1, f)
+
+li_2 = [5,6]
+pickle.dump(li_2, f)
+
+4). pickle.load(file, *, fix_imports=True, encoding="ASCII", errors="strict")
+
+    从文件中读取，序列化后的字节流，然后转换成python的对象。
+
+代码：
+import pickle
+
+f = open('temp.txt','wb')
+
+li_1 = [1,2,3,4]
+pickle.dump(li_1, f)
+
+li_2 = [5,6]
+pickle.dump(li_2, f)
+
+f.close()
+
+print("---test-----")
+
+f = open('temp.txt','rb')
+print(pickle.load(f))
+print(pickle.load(f))
+
+
+2. Python中哪些对象可以被序列化？
+
+    1） None True False
+    2） 整数，浮点数，复数
+    3） str  bytes bytearray
+    4)  元组 列表 集合 字典
+    5） 定义在模块最顶层的函数（使用def定义的，不包括匿名函数），不会序列化函数代码和属性。
+    6） 定义在模块最顶层的类，不会序列化类的代码和属性。
+    7） 大部分实例对象。
+
+
+
